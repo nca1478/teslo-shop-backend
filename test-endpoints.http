@@ -1,0 +1,89 @@
+### Test Teslo Shop Backend API
+
+@baseUrl = http://localhost:3002/api
+@token = 
+
+### 1. Register a new user
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "password": "123456",
+  "fullName": "Test User"
+}
+
+### 2. Login with admin user
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@teslo.com",
+  "password": "123456"
+}
+
+### 3. Get all products (no auth required)
+GET {{baseUrl}}/products
+
+### 4. Get product by slug
+GET {{baseUrl}}/products/mens_chill_crew_neck_sweatshirt
+
+### 5. Get all categories
+GET {{baseUrl}}/categories
+
+### 6. Get all countries
+GET {{baseUrl}}/countries
+
+### 7. Create a new product (Admin only - requires token)
+POST {{baseUrl}}/products
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Test Product",
+  "description": "A test product description",
+  "price": 99.99,
+  "slug": "test-product",
+  "stock": 10,
+  "sizes": ["M", "L", "XL"],
+  "gender": "men",
+  "tags": ["test", "new"],
+  "images": ["test-image.jpg"],
+  "categoryId": "category-id-here"
+}
+
+### 8. Get all users (Admin only - requires token)
+GET {{baseUrl}}/users
+Authorization: Bearer {{token}}
+
+### 9. Place an order (requires token)
+POST {{baseUrl}}/orders
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "items": [
+    {
+      "productId": "product-id-here",
+      "quantity": 2,
+      "size": "M"
+    }
+  ],
+  "address": {
+    "firstName": "John",
+    "lastName": "Doe",
+    "address": "123 Main St",
+    "postalCode": "12345",
+    "city": "New York",
+    "phone": "555-1234",
+    "countryId": "US"
+  }
+}
+
+### 10. Get my orders (requires token)
+GET {{baseUrl}}/orders/my-orders
+Authorization: Bearer {{token}}
+
+### 11. Get all orders (Admin only - requires token)
+GET {{baseUrl}}/orders
+Authorization: Bearer {{token}}

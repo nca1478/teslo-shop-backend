@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: teslo-postgres
+    restart: always
+    environment:
+      POSTGRES_DB: teslo_shop
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123456
+    ports:
+      - '5433:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # app:
+  #   build: .
+  #   container_name: teslo-backend
+  #   restart: always
+  #   ports:
+  #     - '3001:3001'
+  #   environment:
+  #     DATABASE_URL: 'postgresql://postgres:123456@postgres:5432/teslo_shop?schema=public'
+  #     JWT_SECRET: 'your-super-secret-jwt-key-change-this-in-production'
+  #     JWT_EXPIRES_IN: '24h'
+  #     PORT: 3001
+  #     NODE_ENV: production
+  #   depends_on:
+  #     - postgres
+  #   volumes:
+  #     - .:/app
+  #     - /app/node_modules
+
+volumes:
+  postgres_data:

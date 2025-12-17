@@ -1,0 +1,117 @@
+import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import {
+  PayPalService,
+  PayPalPaymentDetails,
+} from '../../../application/ports/external/paypal.service';
+
+@Injectable()
+export class PayPalAdapter implements PayPalService {
+  private readonly clientId: string;
+  private readonly clientSecret: string;
+  private readonly baseUrl: string;
+
+  constructor(private readonly configService: ConfigService) {
+    this.clientId = this.configService.get('PAYPAL_CLIENT_ID') || '';
+    this.clientSecret = this.configService.get('PAYPAL_CLIENT_SECRET') || '';
+    this.baseUrl =
+      this.configService.get('PAYPAL_BASE_URL') ||
+      'https://api-m.sandbox.paypal.com';
+  }
+
+  async verifyPayment(paymentId: string): Promise<PayPalPaymentDetails> {
+    const accessToken = await this.getAccessToken();
+
+    const response = await fetch(
+      `${this.baseUrl}/v2/checkout/orders/${paymentId}`,
+      {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+      },
+    );
+
+    if (!response.ok) {
+      throw new Error(`PayPal API error: ${response.statusText}`);
+    }
+
+    const paymentData = await response.json();
+
+    return {
+      id: paymentData.id,
+      status: paymentData.status,
+      amount: paymentData.purchase_units[0].amount,
+      payer: paymentData.payer,
+    };
+  }
+
+  async createPayment(
+    amount: number,
+    currency: string = 'USD',
+  ): Promise<{ id: string; approval_url: string }> {
+    const accessToken = await this.getAccessToken();
+
+    const orderData = {
+      intent: 'CAPTURE',
+      purchase_units: [
+        {
+          amount: {
+            currency_code: currency,
+            value: amount.toFixed(2),
+          },
+        },
+      ],
+      application_context: {
+        return_url: `${this.configService.get('FRONTEND_URL')}/checkout/success`,
+        cancel_url: `${this.configService.get('FRONTEND_URL')}/checkout/cancel`,
+      },
+    };
+
+    const response = await fetch(`${this.baseUrl}/v2/checkout/orders`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(orderData),
+    });
+
+    if (!response.ok) {
+      throw new Error(`PayPal API error: ${response.statusText}`);
+    }
+
+    const order = await response.json();
+    const approvalUrl = order.links.find(
+      (link: any) => link.rel === 'approve',
+    )?.href;
+
+    return {
+      id: order.id,
+      approval_url: approvalUrl,
+    };
+  }
+
+  private async getAccessToken(): Promise<string> {
+    const auth = Buffer.from(`${this.clientId}:${this.clientSecret}`).toString(
+      'base64',
+    );
+
+    const response = await fetch(`${this.baseUrl}/v1/oauth2/token`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Basic ${auth}`,
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: 'grant_type=client_credentials',
+    });
+
+    if (!response.ok) {
+      throw new Error(`PayPal auth error: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data.access_token;
+  }
+}
