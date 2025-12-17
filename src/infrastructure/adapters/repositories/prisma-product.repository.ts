@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ProductRepository } from '../../../application/ports/repositories/product.repository';
 import { Product } from '../../../domain/entities/product.entity';
 import { PrismaService } from '../../database/prisma.service';
+import { Size, Gender } from '@prisma/client';
 
 @Injectable()
 export class PrismaProductRepository implements ProductRepository {
@@ -44,10 +45,10 @@ export class PrismaProductRepository implements ProductRepository {
         description: productData.description,
         inStock: productData.stock,
         price: productData.price,
-        sizes: productData.sizes as any[],
+        sizes: productData.sizes as Size[],
         slug: productData.slug,
         tags: productData.tags,
-        gender: productData.gender as any,
+        gender: productData.gender as Gender,
         categoryId: productData.categoryId,
         ProductImage: {
           create: productData.images.map((url) => ({ url })),
@@ -63,17 +64,27 @@ export class PrismaProductRepository implements ProductRepository {
   }
 
   async update(id: string, productData: Partial<Product>): Promise<Product> {
-    const updateData: any = {};
+    const updateData: {
+      title?: string;
+      description?: string;
+      inStock?: number;
+      price?: number;
+      sizes?: Size[];
+      slug?: string;
+      tags?: string[];
+      gender?: Gender;
+      categoryId?: string;
+    } = {};
 
     if (productData.title) updateData.title = productData.title;
     if (productData.description)
       updateData.description = productData.description;
     if (productData.stock !== undefined) updateData.inStock = productData.stock;
     if (productData.price !== undefined) updateData.price = productData.price;
-    if (productData.sizes) updateData.sizes = productData.sizes;
+    if (productData.sizes) updateData.sizes = productData.sizes as Size[];
     if (productData.slug) updateData.slug = productData.slug;
     if (productData.tags) updateData.tags = productData.tags;
-    if (productData.gender) updateData.gender = productData.gender;
+    if (productData.gender) updateData.gender = productData.gender as Gender;
     if (productData.categoryId) updateData.categoryId = productData.categoryId;
 
     const product = await this.prisma.product.update({
@@ -103,9 +114,17 @@ export class PrismaProductRepository implements ProductRepository {
   }): Promise<{ products: Product[]; total: number }> {
     const { page, limit, gender, category, search } = filters;
 
-    const where: any = {};
+    const where: {
+      gender?: Gender;
+      Category?: { name: { contains: string; mode: 'insensitive' } };
+      OR?: Array<{
+        title?: { contains: string; mode: 'insensitive' };
+        description?: { contains: string; mode: 'insensitive' };
+        tags?: { has: string };
+      }>;
+    } = {};
 
-    if (gender) where.gender = gender;
+    if (gender) where.gender = gender as Gender;
     if (category)
       where.Category = { name: { contains: category, mode: 'insensitive' } };
     if (search) {
@@ -146,7 +165,19 @@ export class PrismaProductRepository implements ProductRepository {
     });
   }
 
-  private mapToProduct(product: any): Product {
+  private mapToProduct(product: {
+    id: string;
+    title: string;
+    price: number;
+    description: string;
+    slug: string;
+    inStock: number;
+    sizes: Size[];
+    gender: Gender;
+    tags: string[];
+    ProductImage: Array<{ url: string }>;
+    categoryId: string;
+  }): Product {
     return {
       id: product.id,
       title: product.title,
@@ -154,10 +185,10 @@ export class PrismaProductRepository implements ProductRepository {
       description: product.description,
       slug: product.slug,
       stock: product.inStock,
-      sizes: product.sizes,
-      gender: product.gender,
+      sizes: product.sizes as string[],
+      gender: product.gender as string,
       tags: product.tags,
-      images: product.ProductImage.map((img: any) => img.url),
+      images: product.ProductImage.map((img) => img.url),
       categoryId: product.categoryId,
       userId: '', // Not available in current schema
       createdAt: new Date(),

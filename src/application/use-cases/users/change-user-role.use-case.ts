@@ -43,6 +43,8 @@ export class ChangeUserRoleUseCase {
 
     // Remove password from response
     const { password, ...safeUser } = updatedUser;
+    // Explicitly ignore password variable
+    void password;
     return safeUser;
   }
 }

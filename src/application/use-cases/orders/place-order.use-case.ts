@@ -36,7 +36,7 @@ export class PlaceOrderUseCase {
   ) {}
 
   async execute(request: PlaceOrderRequest): Promise<Order> {
-    const { userId, items, address } = request;
+    const { userId, items } = request;
 
     // Validate products and calculate totals
     let subTotal = 0;

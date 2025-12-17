@@ -27,7 +27,7 @@ export class CloudinaryAdapter implements FileUploadService {
           },
           (error, result) => {
             if (error) {
-              reject(error);
+              reject(new Error(error.message || 'Upload failed'));
             } else if (result) {
               resolve({
                 url: result.secure_url,

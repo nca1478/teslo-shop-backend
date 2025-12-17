@@ -5,7 +5,10 @@ import {
   ApiResponse,
   ApiBearerAuth,
 } from '@nestjs/swagger';
-import { SetUserAddressUseCase } from '../../application/use-cases/addresses/set-user-address.use-case';
+import {
+  SetUserAddressUseCase,
+  SetUserAddressRequest,
+} from '../../application/use-cases/addresses/set-user-address.use-case';
 import { GetUserAddressUseCase } from '../../application/use-cases/addresses/get-user-address.use-case';
 import { DeleteUserAddressUseCase } from '../../application/use-cases/addresses/delete-user-address.use-case';
 import { JwtAuthGuard } from '../../infrastructure/adapters/auth/jwt-auth.guard';
@@ -35,7 +38,10 @@ export class AddressesController {
   @ApiOperation({ summary: 'Set user address' })
   @ApiResponse({ status: 201, description: 'Address set successfully' })
   @ApiResponse({ status: 400, description: 'Bad request' })
-  async setUserAddress(@Body() addressData: any, @GetUser() user: User) {
+  async setUserAddress(
+    @Body() addressData: Omit<SetUserAddressRequest, 'userId'>,
+    @GetUser() user: User,
+  ) {
     return this.setUserAddressUseCase.execute({
       ...addressData,
       userId: user.id,

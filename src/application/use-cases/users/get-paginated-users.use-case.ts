@@ -32,7 +32,11 @@ export class GetPaginatedUsersUseCase {
     const totalPages = Math.ceil(total / limit);
 
     // Remove password from response
-    const safeUsers = users.map(({ password, ...user }) => user);
+    const safeUsers = users.map(({ password, ...user }) => {
+      // Explicitly ignore password variable
+      void password;
+      return user;
+    });
 
     return {
       users: safeUsers,

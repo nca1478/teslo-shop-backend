@@ -17,6 +17,7 @@ import { PrismaAddressRepository } from './infrastructure/adapters/repositories/
 import { JwtAuthService } from './infrastructure/adapters/auth/jwt-auth.service';
 import { JwtStrategy } from './infrastructure/adapters/auth/jwt.strategy';
 import { HttpExceptionFilter } from './infrastructure/common/filters/http-exception.filter';
+import { PayPalAdapter } from './infrastructure/adapters/external/paypal.adapter';
 
 // Application - Auth
 import { LoginUseCase } from './application/use-cases/auth/login.use-case';
@@ -137,6 +138,10 @@ import jwtConfig from './infrastructure/config/jwt.config';
     {
       provide: INJECTION_TOKENS.AUTH_SERVICE,
       useClass: JwtAuthService,
+    },
+    {
+      provide: INJECTION_TOKENS.PAYPAL_SERVICE,
+      useClass: PayPalAdapter,
     },
 
     // Auth Use Cases

@@ -37,7 +37,20 @@ export class PayPalAdapter implements PayPalService {
       throw new Error(`PayPal API error: ${response.statusText}`);
     }
 
-    const paymentData = await response.json();
+    const paymentData = (await response.json()) as {
+      id: string;
+      status: string;
+      purchase_units: Array<{
+        amount: {
+          currency_code: string;
+          value: string;
+        };
+      }>;
+      payer: {
+        email_address: string;
+        payer_id: string;
+      };
+    };
 
     return {
       id: paymentData.id,
@@ -82,10 +95,17 @@ export class PayPalAdapter implements PayPalService {
       throw new Error(`PayPal API error: ${response.statusText}`);
     }
 
-    const order = await response.json();
+    const order = (await response.json()) as {
+      id: string;
+      links: Array<{ rel: string; href: string }>;
+    };
     const approvalUrl = order.links.find(
-      (link: any) => link.rel === 'approve',
+      (link) => link.rel === 'approve',
     )?.href;
+
+    if (!approvalUrl) {
+      throw new Error('PayPal approval URL not found in response');
+    }
 
     return {
       id: order.id,
@@ -111,7 +131,7 @@ export class PayPalAdapter implements PayPalService {
       throw new Error(`PayPal auth error: ${response.statusText}`);
     }
 
-    const data = await response.json();
+    const data = (await response.json()) as { access_token: string };
     return data.access_token;
   }
 }

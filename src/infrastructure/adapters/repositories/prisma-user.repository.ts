@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { UserRepository } from '../../../application/ports/repositories/user.repository';
 import { User } from '../../../domain/entities/user.entity';
 import { PrismaService } from '../../database/prisma.service';
+import { Role } from '@prisma/client';
 
 @Injectable()
 export class PrismaUserRepository implements UserRepository {
@@ -53,7 +54,7 @@ export class PrismaUserRepository implements UserRepository {
         email: userData.email,
         password: userData.password,
         name: userData.fullName,
-        role: userData.roles[0] as any,
+        role: userData.roles[0] as Role,
       },
     });
 
@@ -70,13 +71,18 @@ export class PrismaUserRepository implements UserRepository {
   }
 
   async update(id: string, userData: Partial<User>): Promise<User> {
-    const updateData: any = {};
+    const updateData: {
+      email?: string;
+      password?: string;
+      name?: string;
+      role?: Role;
+    } = {};
 
     if (userData.email) updateData.email = userData.email;
     if (userData.password) updateData.password = userData.password;
     if (userData.fullName) updateData.name = userData.fullName;
     if (userData.roles && userData.roles.length > 0)
-      updateData.role = userData.roles[0];
+      updateData.role = userData.roles[0] as Role;
 
     const user = await this.prisma.user.update({
       where: { id },

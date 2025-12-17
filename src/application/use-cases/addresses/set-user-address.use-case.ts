@@ -2,10 +2,7 @@ import { Injectable, Inject } from '@nestjs/common';
 import type { AddressRepository } from '../../ports/repositories/address.repository';
 import type { CountryRepository } from '../../ports/repositories/country.repository';
 import { UserAddress } from '../../../domain/entities/address.entity';
-import {
-  ValidationDomainException,
-  NotFoundDomainException,
-} from '../../../domain/exceptions/domain.exception';
+import { NotFoundDomainException } from '../../../domain/exceptions/domain.exception';
 import { INJECTION_TOKENS } from '../../../shared/constants/injection-tokens';
 
 export interface SetUserAddressRequest {

@@ -68,4 +68,5 @@ async function bootstrap() {
   }
   logger.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
 }
-bootstrap();
+
+void bootstrap();

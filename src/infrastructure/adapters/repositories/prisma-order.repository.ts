@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { OrderRepository } from '../../../application/ports/repositories/order.repository';
-import { Order, OrderItem } from '../../../domain/entities/order.entity';
+import { Order } from '../../../domain/entities/order.entity';
+import { Size } from '../../../domain/enums/size.enum';
 import { PrismaService } from '../../database/prisma.service';
 
 @Injectable()
@@ -37,7 +38,7 @@ export class PrismaOrderRepository implements OrderRepository {
           create: orderItems.map((item) => ({
             quantity: item.quantity,
             price: item.price,
-            size: item.size as any,
+            size: item.size as Size,
             productId: item.productId,
           })),
         },
@@ -127,7 +128,27 @@ export class PrismaOrderRepository implements OrderRepository {
     };
   }
 
-  private mapToOrder(order: any): Order {
+  private mapToOrder(order: {
+    id: string;
+    subTotal: number;
+    tax: number;
+    total: number;
+    itemsInOrder: number;
+    isPaid: boolean;
+    paidAt: Date | null;
+    transactionId: string | null;
+    userId: string;
+    OrderItem?: Array<{
+      id: string;
+      quantity: number;
+      price: number;
+      size: string;
+      productId: string;
+      orderId: string;
+    }>;
+    createdAt: Date;
+    updatedAt: Date;
+  }): Order {
     return {
       id: order.id,
       subTotal: order.subTotal,
@@ -135,17 +156,18 @@ export class PrismaOrderRepository implements OrderRepository {
       total: order.total,
       itemsInOrder: order.itemsInOrder,
       isPaid: order.isPaid,
-      paidAt: order.paidAt,
-      transactionId: order.transactionId,
+      paidAt: order.paidAt || undefined,
+      transactionId: order.transactionId || undefined,
       userId: order.userId,
-      orderItems: order.OrderItem.map((item: any) => ({
-        id: item.id,
-        quantity: item.quantity,
-        price: item.price,
-        size: item.size,
-        productId: item.productId,
-        orderId: item.orderId,
-      })),
+      orderItems:
+        order.OrderItem?.map((item) => ({
+          id: item.id,
+          quantity: item.quantity,
+          price: item.price,
+          size: item.size,
+          productId: item.productId,
+          orderId: item.orderId,
+        })) || [],
       createdAt: order.createdAt,
       updatedAt: order.updatedAt,
     };
