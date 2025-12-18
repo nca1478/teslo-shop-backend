@@ -3,8 +3,6 @@ import { ConfigModule } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { APP_FILTER } from '@nestjs/core';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 
 // Infrastructure
 import { PrismaService } from './infrastructure/database/prisma.service';
@@ -86,7 +84,6 @@ import jwtConfig from './infrastructure/config/jwt.config';
     }),
   ],
   controllers: [
-    AppController,
     AuthController,
     ProductsController,
     OrdersController,
@@ -98,7 +95,6 @@ import jwtConfig from './infrastructure/config/jwt.config';
     HealthController,
   ],
   providers: [
-    AppService,
     PrismaService,
     JwtStrategy,
 
