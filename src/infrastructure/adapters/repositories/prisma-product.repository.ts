@@ -100,6 +100,12 @@ export class PrismaProductRepository implements ProductRepository {
   }
 
   async delete(id: string): Promise<void> {
+    // First delete all product images
+    await this.prisma.productImage.deleteMany({
+      where: { productId: id },
+    });
+
+    // Then delete the product
     await this.prisma.product.delete({
       where: { id },
     });
