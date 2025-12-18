@@ -4,10 +4,11 @@ import { Pool } from 'pg';
 import * as bcrypt from 'bcryptjs';
 
 // Load environment variables
-require('dotenv').config({ path: '../.env' });
+import 'dotenv/config';
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
+  ssl: false, // Disable SSL for local development
 });
 
 const adapter = new PrismaPg(pool);
