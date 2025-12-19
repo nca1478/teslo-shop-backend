@@ -87,6 +87,22 @@ export class PrismaProductRepository implements ProductRepository {
     if (productData.gender) updateData.gender = productData.gender as Gender;
     if (productData.categoryId) updateData.categoryId = productData.categoryId;
 
+    // Handle images update if provided
+    if (productData.images && productData.images.length > 0) {
+      // Delete existing images first
+      await this.prisma.productImage.deleteMany({
+        where: { productId: id },
+      });
+
+      // Create new images
+      await this.prisma.productImage.createMany({
+        data: productData.images.map((url) => ({
+          url,
+          productId: id,
+        })),
+      });
+    }
+
     const product = await this.prisma.product.update({
       where: { id },
       data: updateData,
@@ -117,8 +133,18 @@ export class PrismaProductRepository implements ProductRepository {
     gender?: string;
     category?: string;
     search?: string;
+    sortBy?: string;
+    sortOrder?: 'asc' | 'desc';
   }): Promise<{ products: Product[]; total: number }> {
-    const { page, limit, gender, category, search } = filters;
+    const {
+      page,
+      limit,
+      gender,
+      category,
+      search,
+      sortBy = 'title',
+      sortOrder = 'asc',
+    } = filters;
 
     const where: {
       gender?: Gender;
@@ -141,11 +167,33 @@ export class PrismaProductRepository implements ProductRepository {
       ];
     }
 
+    // Create orderBy object based on sortBy parameter
+    const orderBy: Record<string, 'asc' | 'desc'> = {};
+
+    // Map sortBy to actual database field names
+    switch (sortBy) {
+      case 'title':
+        orderBy.title = sortOrder;
+        break;
+      case 'price':
+        orderBy.price = sortOrder;
+        break;
+      case 'createdAt':
+        orderBy.createdAt = sortOrder;
+        break;
+      case 'stock':
+        orderBy.inStock = sortOrder;
+        break;
+      default:
+        orderBy.title = sortOrder; // Default to title sorting
+    }
+
     const [products, total] = await Promise.all([
       this.prisma.product.findMany({
         where,
         skip: (page - 1) * limit,
         take: limit,
+        orderBy,
         include: {
           ProductImage: true,
           Category: true,

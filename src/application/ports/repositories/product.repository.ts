@@ -14,6 +14,8 @@ export interface ProductRepository {
     gender?: string;
     category?: string;
     search?: string;
+    sortBy?: string;
+    sortOrder?: 'asc' | 'desc';
   }): Promise<{ products: Product[]; total: number }>;
   updateStock(id: string, quantity: number): Promise<void>;
 }

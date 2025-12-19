@@ -27,4 +27,14 @@ export class GetProductsDto {
   @IsOptional()
   @IsString()
   search?: string;
+
+  @IsOptional()
+  @IsString()
+  @IsIn(['title', 'price', 'createdAt', 'stock'])
+  sortBy?: string = 'title';
+
+  @IsOptional()
+  @IsString()
+  @IsIn(['asc', 'desc'])
+  sortOrder?: 'asc' | 'desc' = 'asc';
 }

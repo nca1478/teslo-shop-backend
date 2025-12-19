@@ -9,6 +9,8 @@ export interface GetProductsRequest {
   gender?: string;
   category?: string;
   search?: string;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
 }
 
 export interface GetProductsResponse {
@@ -27,7 +29,15 @@ export class GetProductsUseCase {
   ) {}
 
   async execute(request: GetProductsRequest): Promise<GetProductsResponse> {
-    const { page = 1, limit = 12, gender, category, search } = request;
+    const {
+      page = 1,
+      limit = 12,
+      gender,
+      category,
+      search,
+      sortBy = 'title',
+      sortOrder = 'asc',
+    } = request;
 
     const { products, total } = await this.productRepository.findAll({
       page,
@@ -35,6 +45,8 @@ export class GetProductsUseCase {
       gender,
       category,
       search,
+      sortBy,
+      sortOrder,
     });
 
     const totalPages = Math.ceil(total / limit);
