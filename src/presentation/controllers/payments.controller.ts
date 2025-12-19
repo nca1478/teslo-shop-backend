@@ -33,9 +33,7 @@ export class PaymentsController {
   @ApiOperation({ summary: 'Verify PayPal payment' })
   @ApiResponse({ status: 200, description: 'Payment verified successfully' })
   @ApiResponse({ status: 400, description: 'Payment verification failed' })
-  async checkPayPalPayment(
-    @Body() body: { orderId: string; paypalTransactionId: string },
-  ) {
+  async checkPayPalPayment(@Body() body: { paypalTransactionId: string }) {
     return this.paypalCheckPaymentUseCase.execute(body);
   }
 }

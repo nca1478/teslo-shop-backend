@@ -31,6 +31,28 @@ export class PrismaOrderRepository implements OrderRepository {
     return this.mapToOrder(order);
   }
 
+  async findByTransactionId(transactionId: string): Promise<Order | null> {
+    const order = await this.prisma.order.findFirst({
+      where: { transactionId },
+      include: {
+        OrderItem: {
+          include: {
+            product: {
+              include: {
+                ProductImage: true,
+              },
+            },
+          },
+        },
+        OrderAddress: true,
+      },
+    });
+
+    if (!order) return null;
+
+    return this.mapToOrder(order);
+  }
+
   async create(
     orderData: Omit<Order, 'id' | 'createdAt' | 'updatedAt'>,
   ): Promise<Order> {

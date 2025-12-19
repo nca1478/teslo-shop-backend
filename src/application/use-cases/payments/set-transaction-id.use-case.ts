@@ -25,11 +25,9 @@ export class SetTransactionIdUseCase {
       throw new NotFoundDomainException('Order', orderId);
     }
 
-    // Update order with transaction ID and mark as paid
+    // Update order with transaction ID only
     return this.orderRepository.update(orderId, {
       transactionId,
-      isPaid: true,
-      paidAt: new Date(),
     });
   }
 }

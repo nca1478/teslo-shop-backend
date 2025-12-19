@@ -9,7 +9,6 @@ import {
 import { INJECTION_TOKENS } from '../../../shared/constants/injection-tokens';
 
 export interface PayPalCheckPaymentRequest {
-  orderId: string;
   paypalTransactionId: string;
 }
 
@@ -23,24 +22,27 @@ export class PayPalCheckPaymentUseCase {
   ) {}
 
   async execute(request: PayPalCheckPaymentRequest): Promise<Order> {
-    const { orderId, paypalTransactionId } = request;
+    const { paypalTransactionId } = request;
 
-    // Check if order exists
-    const order = await this.orderRepository.findById(orderId);
-    if (!order) {
-      throw new NotFoundDomainException('Order', orderId);
-    }
-
-    // Verify payment with PayPal
     const paymentDetails =
       await this.paypalService.verifyPayment(paypalTransactionId);
 
-    // Validate payment status
     if (paymentDetails.status !== 'COMPLETED') {
       throw new ValidationDomainException('Payment not completed');
     }
 
-    // Validate payment amount
+    const orderId = paymentDetails.payer.payer_id;
+
+    let order =
+      await this.orderRepository.findByTransactionId(paypalTransactionId);
+
+    if (!order) {
+      throw new NotFoundDomainException(
+        'Order',
+        'with transaction ID: ' + paypalTransactionId,
+      );
+    }
+
     const paymentAmount = parseFloat(paymentDetails.amount.value);
 
     // En modo de prueba, ser más flexible con la validación del monto
@@ -55,7 +57,7 @@ export class PayPalCheckPaymentUseCase {
     }
 
     // Update order as paid
-    return this.orderRepository.update(orderId, {
+    return this.orderRepository.update(order.id, {
       transactionId: paypalTransactionId,
       isPaid: true,
       paidAt: new Date(),
