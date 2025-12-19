@@ -1,10 +1,15 @@
 import { PrismaClient } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { Pool } from 'pg';
-import * as bcrypt from 'bcryptjs';
 
 // Load environment variables
 import 'dotenv/config';
+
+// Import seed data
+import { users } from './data/users';
+import { categories } from './data/categories';
+import { countries } from './data/countries';
+import { products } from './data/products';
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
@@ -15,136 +20,79 @@ const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
-  // Create categories
-  const categories = await Promise.all([
-    prisma.category.upsert({
-      where: { name: 'Shirts' },
-      update: {},
-      create: { name: 'Shirts' },
-    }),
-    prisma.category.upsert({
-      where: { name: 'Pants' },
-      update: {},
-      create: { name: 'Pants' },
-    }),
-    prisma.category.upsert({
-      where: { name: 'Hoodies' },
-      update: {},
-      create: { name: 'Hoodies' },
-    }),
-    prisma.category.upsert({
-      where: { name: 'Hats' },
-      update: {},
-      create: { name: 'Hats' },
-    }),
-  ]);
+  console.log('🌱 Starting seed process...');
 
-  // Create countries
-  const countries = await Promise.all([
-    prisma.country.upsert({
-      where: { id: 'US' },
-      update: {},
-      create: { id: 'US', name: 'United States' },
-    }),
-    prisma.country.upsert({
-      where: { id: 'CA' },
-      update: {},
-      create: { id: 'CA', name: 'Canada' },
-    }),
-    prisma.country.upsert({
-      where: { id: 'MX' },
-      update: {},
-      create: { id: 'MX', name: 'Mexico' },
-    }),
-  ]);
+  // 1. Clean existing data
+  console.log('🧹 Cleaning existing data...');
 
-  // Create admin user
-  const hashedPassword = await bcrypt.hash('123456', 10);
+  // Delete in order to respect foreign key constraints
+  await prisma.orderAddress.deleteMany();
+  await prisma.orderItem.deleteMany();
+  await prisma.order.deleteMany();
+  await prisma.userAddress.deleteMany();
+  await prisma.user.deleteMany();
+  await prisma.productImage.deleteMany();
+  await prisma.product.deleteMany();
+  await prisma.category.deleteMany();
+  await prisma.country.deleteMany();
 
-  const adminUser = await prisma.user.upsert({
-    where: { email: 'admin@teslo.com' },
-    update: {},
-    create: {
-      email: 'admin@teslo.com',
-      name: 'Admin User',
-      password: hashedPassword,
-      role: 'admin',
-    },
+  // 2. Create users
+  console.log('👥 Creating users...');
+  await prisma.user.createMany({
+    data: users,
   });
 
-  // Create regular user
-  const regularUser = await prisma.user.upsert({
-    where: { email: 'user@teslo.com' },
-    update: {},
-    create: {
-      email: 'user@teslo.com',
-      name: 'Regular User',
-      password: hashedPassword,
-      role: 'user',
-    },
+  // 3. Create countries
+  console.log('🌍 Creating countries...');
+  await prisma.country.createMany({
+    data: countries,
   });
 
-  // Create sample products
-  const products = [
-    {
-      title: "Men's Chill Crew Neck Sweatshirt",
-      description:
-        "The Men's Chill Crew Neck Sweatshirt has a premium, relaxed fit made from a cotton and polyester blend.",
-      inStock: 7,
-      price: 75,
-      sizes: ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
-      slug: 'mens_chill_crew_neck_sweatshirt',
-      tags: ['sweatshirt'],
-      gender: 'men',
-      categoryId: categories[2].id, // Hoodies
-      images: ['1740176-00-A_0_2000.jpg', '1740176-00-A_1.jpg'],
-    },
-    {
-      title: "Men's Quilted Shirt Jacket",
-      description:
-        "The Men's Quilted Shirt Jacket features a uniquely fit, quilted design.",
-      inStock: 5,
-      price: 200,
-      sizes: ['XS', 'S', 'M', 'XL', 'XXL'],
-      slug: 'mens_quilted_shirt_jacket',
-      tags: ['jacket'],
-      gender: 'men',
-      categoryId: categories[0].id, // Shirts
-      images: ['1740507-00-A_0_2000.jpg', '1740507-00-A_1.jpg'],
-    },
-    {
-      title: "Women's Cropped Puffer Jacket",
-      description:
-        "The Women's Cropped Puffer Jacket features a uniquely cropped silhouette.",
-      inStock: 3,
-      price: 225,
-      sizes: ['XS', 'S', 'M'],
-      slug: 'womens_cropped_puffer_jacket',
-      tags: ['jacket'],
-      gender: 'women',
-      categoryId: categories[0].id, // Shirts
-      images: ['1740250-00-A_0_2000.jpg', '1740250-00-A_1.jpg'],
-    },
-  ];
+  // 4. Create categories
+  console.log('📂 Creating categories...');
+  await prisma.category.createMany({
+    data: categories,
+  });
 
+  // Get categories for mapping
+  const dbCategories = await prisma.category.findMany();
+  const categoriesMap = dbCategories.reduce(
+    (map, category) => {
+      map[category.name.toLowerCase()] = category.id;
+      return map;
+    },
+    {} as Record<string, string>,
+  );
+
+  // 5. Create products with images
+  console.log('🛍️ Creating products...');
   for (const productData of products) {
-    const { images, ...product } = productData;
+    const { images, categoryType, ...product } = productData;
 
-    await prisma.product.upsert({
-      where: { slug: product.slug },
-      update: {},
-      create: {
+    const dbProduct = await prisma.product.create({
+      data: {
         ...product,
-        sizes: product.sizes as any,
-        gender: product.gender as any,
-        ProductImage: {
-          create: images.map((url) => ({ url })),
-        },
+        categoryId: categoriesMap[categoryType],
       },
+    });
+
+    // Create product images
+    const imagesData = images.map((url) => ({
+      url,
+      productId: dbProduct.id,
+    }));
+
+    await prisma.productImage.createMany({
+      data: imagesData,
     });
   }
 
   console.log('✅ Seed completed successfully');
+  console.log(`📊 Created:`);
+  console.log(`   - ${users.length} users`);
+  console.log(`   - ${countries.length} countries`);
+  console.log(`   - ${categories.length} categories`);
+  console.log(`   - ${products.length} products`);
 }
 
 main()
