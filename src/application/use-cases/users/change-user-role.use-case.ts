@@ -11,6 +11,7 @@ import { INJECTION_TOKENS } from '../../../shared/constants/injection-tokens';
 export interface ChangeUserRoleRequest {
   userId: string;
   role: Role;
+  currentUserId: string;
 }
 
 @Injectable()
@@ -23,28 +24,28 @@ export class ChangeUserRoleUseCase {
   async execute(
     request: ChangeUserRoleRequest,
   ): Promise<Omit<User, 'password'>> {
-    const { userId, role } = request;
+    const { userId, role, currentUserId } = request;
 
-    // Check if user exists
+    if (userId === currentUserId) {
+      throw new ValidationDomainException('Cannot change your own role');
+    }
+
     const user = await this.userRepository.findById(userId);
     if (!user) {
       throw new NotFoundDomainException('User', userId);
     }
 
-    // Validate role
     if (!Object.values(Role).includes(role)) {
       throw new ValidationDomainException('Invalid role');
     }
 
-    // Update user role
     const updatedUser = await this.userRepository.update(userId, {
       roles: [role],
     });
 
     // Remove password from response
     const { password, ...safeUser } = updatedUser;
-    // Explicitly ignore password variable
-    void password;
+    void password; // Explicitly ignore password variable
     return safeUser;
   }
 }

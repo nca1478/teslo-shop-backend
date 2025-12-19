@@ -20,10 +20,10 @@ export class PrismaUserRepository implements UserRepository {
       email: user.email,
       password: user.password,
       name: user.name,
-      isActive: true, // Assuming all users are active by default
+      isActive: true,
       roles: [user.role],
-      createdAt: new Date(), // Prisma doesn't have createdAt in the current schema
-      updatedAt: new Date(), // Prisma doesn't have updatedAt in the current schema
+      createdAt: new Date(),
+      updatedAt: new Date(),
     };
   }
 
@@ -115,6 +115,9 @@ export class PrismaUserRepository implements UserRepository {
       this.prisma.user.findMany({
         skip: (page - 1) * limit,
         take: limit,
+        orderBy: {
+          name: 'asc',
+        },
       }),
       this.prisma.user.count(),
     ]);
