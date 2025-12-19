@@ -1,6 +1,6 @@
 export enum Gender {
   MEN = 'men',
   WOMEN = 'women',
-  KID = 'kid',
+  KIDS = 'kids',
   UNISEX = 'unisex',
 }
