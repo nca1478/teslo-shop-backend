@@ -20,6 +20,7 @@ import { GetProductBySlugUseCase } from '../../application/use-cases/products/ge
 import { CreateProductUseCase } from '../../application/use-cases/products/create-product.use-case';
 import { UpdateProductUseCase } from '../../application/use-cases/products/update-product.use-case';
 import { DeleteProductUseCase } from '../../application/use-cases/products/delete-product.use-case';
+import { DeleteProductImageUseCase } from '../../application/use-cases/products/delete-product-image.use-case';
 import { GetProductsDto } from '../../application/dtos/products/get-products.dto';
 import { CreateProductDto } from '../../application/dtos/products/create-product.dto';
 import { UpdateProductDto } from '../../application/dtos/products/update-product.dto';
@@ -39,6 +40,7 @@ export class ProductsController {
     private readonly createProductUseCase: CreateProductUseCase,
     private readonly updateProductUseCase: UpdateProductUseCase,
     private readonly deleteProductUseCase: DeleteProductUseCase,
+    private readonly deleteProductImageUseCase: DeleteProductImageUseCase,
   ) {}
 
   @Get()
@@ -87,6 +89,28 @@ export class ProductsController {
     @Body() updateProductDto: UpdateProductDto,
   ) {
     return this.updateProductUseCase.execute(id, updateProductDto);
+  }
+
+  @Delete(':id/images')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Delete product image (Admin only)' })
+  @ApiResponse({
+    status: 200,
+    description: 'Product image deleted successfully',
+  })
+  @ApiResponse({ status: 404, description: 'Product or image not found' })
+  @ApiResponse({ status: 403, description: 'Forbidden - Admin role required' })
+  async deleteProductImage(
+    @Param('id') productId: string,
+    @Body() body: { imageUrl: string },
+  ) {
+    await this.deleteProductImageUseCase.execute({
+      productId,
+      imageUrl: body.imageUrl,
+    });
+    return { message: 'Product image deleted successfully' };
   }
 
   @Delete(':id')

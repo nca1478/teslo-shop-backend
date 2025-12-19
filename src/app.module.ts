@@ -16,6 +16,7 @@ import { JwtAuthService } from './infrastructure/adapters/auth/jwt-auth.service'
 import { JwtStrategy } from './infrastructure/adapters/auth/jwt.strategy';
 import { HttpExceptionFilter } from './infrastructure/common/filters/http-exception.filter';
 import { PayPalAdapter } from './infrastructure/adapters/external/paypal.adapter';
+import { CloudinaryAdapter } from './infrastructure/adapters/external/cloudinary.adapter';
 
 // Application - Auth
 import { LoginUseCase } from './application/use-cases/auth/login.use-case';
@@ -27,6 +28,7 @@ import { GetProductBySlugUseCase } from './application/use-cases/products/get-pr
 import { CreateProductUseCase } from './application/use-cases/products/create-product.use-case';
 import { UpdateProductUseCase } from './application/use-cases/products/update-product.use-case';
 import { DeleteProductUseCase } from './application/use-cases/products/delete-product.use-case';
+import { DeleteProductImageUseCase } from './application/use-cases/products/delete-product-image.use-case';
 
 // Application - Orders
 import { PlaceOrderUseCase } from './application/use-cases/orders/place-order.use-case';
@@ -139,6 +141,10 @@ import jwtConfig from './infrastructure/config/jwt.config';
       provide: INJECTION_TOKENS.PAYPAL_SERVICE,
       useClass: PayPalAdapter,
     },
+    {
+      provide: INJECTION_TOKENS.FILE_UPLOAD_SERVICE,
+      useClass: CloudinaryAdapter,
+    },
 
     // Auth Use Cases
     LoginUseCase,
@@ -150,6 +156,7 @@ import jwtConfig from './infrastructure/config/jwt.config';
     CreateProductUseCase,
     UpdateProductUseCase,
     DeleteProductUseCase,
+    DeleteProductImageUseCase,
 
     // Order Use Cases
     PlaceOrderUseCase,

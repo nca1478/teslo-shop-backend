@@ -8,6 +8,7 @@ export interface ProductRepository {
   ): Promise<Product>;
   update(id: string, product: Partial<Product>): Promise<Product>;
   delete(id: string): Promise<void>;
+  deleteProductImage(productId: string, imageUrl: string): Promise<void>;
   findAll(filters: {
     page: number;
     limit: number;

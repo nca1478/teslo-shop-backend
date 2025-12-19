@@ -127,6 +127,16 @@ export class PrismaProductRepository implements ProductRepository {
     });
   }
 
+  async deleteProductImage(productId: string, imageUrl: string): Promise<void> {
+    // Delete the specific image from ProductImage table
+    await this.prisma.productImage.deleteMany({
+      where: {
+        productId: productId,
+        url: imageUrl,
+      },
+    });
+  }
+
   async findAll(filters: {
     page: number;
     limit: number;
