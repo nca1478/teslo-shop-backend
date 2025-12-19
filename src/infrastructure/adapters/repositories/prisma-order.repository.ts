@@ -15,7 +15,11 @@ export class PrismaOrderRepository implements OrderRepository {
       include: {
         OrderItem: {
           include: {
-            product: true,
+            product: {
+              include: {
+                ProductImage: true,
+              },
+            },
           },
         },
         OrderAddress: true,
@@ -47,7 +51,11 @@ export class PrismaOrderRepository implements OrderRepository {
       include: {
         OrderItem: {
           include: {
-            product: true,
+            product: {
+              include: {
+                ProductImage: true,
+              },
+            },
           },
         },
         OrderAddress: true,
@@ -90,7 +98,11 @@ export class PrismaOrderRepository implements OrderRepository {
       include: {
         OrderItem: {
           include: {
-            product: true,
+            product: {
+              include: {
+                ProductImage: true,
+              },
+            },
           },
         },
         OrderAddress: true,
@@ -114,7 +126,11 @@ export class PrismaOrderRepository implements OrderRepository {
       include: {
         OrderItem: {
           include: {
-            product: true,
+            product: {
+              include: {
+                ProductImage: true,
+              },
+            },
           },
         },
         OrderAddress: true,
@@ -130,7 +146,11 @@ export class PrismaOrderRepository implements OrderRepository {
       include: {
         OrderItem: {
           include: {
-            product: true,
+            product: {
+              include: {
+                ProductImage: true,
+              },
+            },
           },
         },
         OrderAddress: true,
@@ -154,7 +174,11 @@ export class PrismaOrderRepository implements OrderRepository {
         include: {
           OrderItem: {
             include: {
-              product: true,
+              product: {
+                include: {
+                  ProductImage: true,
+                },
+              },
             },
           },
           OrderAddress: true,
@@ -189,6 +213,16 @@ export class PrismaOrderRepository implements OrderRepository {
       size: string;
       productId: string;
       orderId: string;
+      product?: {
+        id: string;
+        title: string;
+        slug: string;
+        ProductImage: Array<{
+          id: number;
+          url: string;
+          productId: string;
+        }>;
+      };
     }>;
     OrderAddress?: {
       id: string;
@@ -223,6 +257,14 @@ export class PrismaOrderRepository implements OrderRepository {
           size: item.size,
           productId: item.productId,
           orderId: item.orderId,
+          product: item.product
+            ? {
+                id: item.product.id,
+                title: item.product.title,
+                slug: item.product.slug,
+                ProductImage: item.product.ProductImage || [],
+              }
+            : undefined,
         })) || [],
       orderAddress: order.OrderAddress
         ? {
