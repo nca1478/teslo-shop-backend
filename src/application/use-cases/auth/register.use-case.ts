@@ -8,14 +8,14 @@ import { INJECTION_TOKENS } from '../../../shared/constants/injection-tokens';
 export interface RegisterRequest {
   email: string;
   password: string;
-  fullName: string;
+  name: string;
 }
 
 export interface RegisterResponse {
   user: {
     id: string;
     email: string;
-    fullName: string;
+    name: string;
     roles: string[];
   };
   token: string;
@@ -31,7 +31,7 @@ export class RegisterUseCase {
   ) {}
 
   async execute(request: RegisterRequest): Promise<RegisterResponse> {
-    const { email, password, fullName } = request;
+    const { email, password, name } = request;
 
     const existingUser = await this.userRepository.findByEmail(email);
     if (existingUser) {
@@ -43,7 +43,7 @@ export class RegisterUseCase {
     const user = await this.userRepository.create({
       email,
       password: hashedPassword,
-      fullName,
+      name,
       isActive: true,
       roles: [Role.USER],
     });
@@ -58,7 +58,7 @@ export class RegisterUseCase {
       user: {
         id: user.id,
         email: user.email,
-        fullName: user.fullName,
+        name: user.name,
         roles: user.roles,
       },
       token,

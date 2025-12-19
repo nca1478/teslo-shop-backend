@@ -19,7 +19,7 @@ export class PrismaUserRepository implements UserRepository {
       id: user.id,
       email: user.email,
       password: user.password,
-      fullName: user.name,
+      name: user.name,
       isActive: true, // Assuming all users are active by default
       roles: [user.role],
       createdAt: new Date(), // Prisma doesn't have createdAt in the current schema
@@ -38,7 +38,7 @@ export class PrismaUserRepository implements UserRepository {
       id: user.id,
       email: user.email,
       password: user.password,
-      fullName: user.name,
+      name: user.name,
       isActive: true,
       roles: [user.role],
       createdAt: new Date(),
@@ -53,7 +53,7 @@ export class PrismaUserRepository implements UserRepository {
       data: {
         email: userData.email,
         password: userData.password,
-        name: userData.fullName,
+        name: userData.name,
         role: userData.roles[0] as Role,
       },
     });
@@ -62,7 +62,7 @@ export class PrismaUserRepository implements UserRepository {
       id: user.id,
       email: user.email,
       password: user.password,
-      fullName: user.name,
+      name: user.name,
       isActive: userData.isActive,
       roles: [user.role],
       createdAt: new Date(),
@@ -80,7 +80,7 @@ export class PrismaUserRepository implements UserRepository {
 
     if (userData.email) updateData.email = userData.email;
     if (userData.password) updateData.password = userData.password;
-    if (userData.fullName) updateData.name = userData.fullName;
+    if (userData.name) updateData.name = userData.name;
     if (userData.roles && userData.roles.length > 0)
       updateData.role = userData.roles[0] as Role;
 
@@ -93,7 +93,7 @@ export class PrismaUserRepository implements UserRepository {
       id: user.id,
       email: user.email,
       password: user.password,
-      fullName: user.name,
+      name: user.name,
       isActive: userData.isActive ?? true,
       roles: [user.role],
       createdAt: new Date(),
@@ -124,7 +124,7 @@ export class PrismaUserRepository implements UserRepository {
         id: user.id,
         email: user.email,
         password: user.password,
-        fullName: user.name,
+        name: user.name,
         isActive: true,
         roles: [user.role],
         createdAt: new Date(),

@@ -9,7 +9,15 @@ export interface GetPaginatedUsersRequest {
 }
 
 export interface GetPaginatedUsersResponse {
-  users: Omit<User, 'password'>[];
+  users: {
+    id: string;
+    email: string;
+    name: string;
+    isActive: boolean;
+    role: string; // Single role for frontend
+    createdAt: Date;
+    updatedAt: Date;
+  }[];
   total: number;
   page: number;
   limit: number;
@@ -31,11 +39,13 @@ export class GetPaginatedUsersUseCase {
     const { users, total } = await this.userRepository.findAll(page, limit);
     const totalPages = Math.ceil(total / limit);
 
-    // Remove password from response
-    const safeUsers = users.map(({ password, ...user }) => {
-      // Explicitly ignore password variable
-      void password;
-      return user;
+    // Remove password from response and map roles array to single role
+    const safeUsers = users.map(({ password, roles, ...user }) => {
+      void password; // Explicitly ignore password variable
+      return {
+        ...user,
+        role: roles[0] || 'user', // Take first role or default to 'user'
+      };
     });
 
     return {

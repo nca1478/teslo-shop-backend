@@ -13,7 +13,7 @@ export interface LoginResponse {
   user: {
     id: string;
     email: string;
-    fullName: string;
+    name: string;
     roles: string[];
   };
   token: string;
@@ -59,7 +59,7 @@ export class LoginUseCase {
       user: {
         id: user.id,
         email: user.email,
-        fullName: user.fullName,
+        name: user.name,
         roles: user.roles,
       },
       token,
