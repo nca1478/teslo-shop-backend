@@ -77,7 +77,7 @@ export class PlaceOrderUseCase {
     const tax = subTotal * 0.15;
     const total = subTotal + tax;
 
-    // Create order
+    // Create order with address
     const orderData = {
       subTotal,
       tax,
@@ -88,7 +88,10 @@ export class PlaceOrderUseCase {
       orderItems: orderItems as OrderItem[],
     };
 
-    const order = await this.orderRepository.create(orderData);
+    const order = await this.orderRepository.createWithAddress(
+      orderData,
+      request.address,
+    );
 
     // Update product stock
     for (const item of items) {

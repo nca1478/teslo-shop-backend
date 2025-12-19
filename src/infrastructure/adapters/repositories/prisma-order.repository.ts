@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { OrderRepository } from '../../../application/ports/repositories/order.repository';
 import { Order } from '../../../domain/entities/order.entity';
+import { OrderAddress } from '../../../domain/entities/address.entity';
 import { Size } from '../../../domain/enums/size.enum';
 import { PrismaService } from '../../database/prisma.service';
 
@@ -41,6 +42,49 @@ export class PrismaOrderRepository implements OrderRepository {
             size: item.size as Size,
             productId: item.productId,
           })),
+        },
+      },
+      include: {
+        OrderItem: {
+          include: {
+            product: true,
+          },
+        },
+        OrderAddress: true,
+      },
+    });
+
+    return this.mapToOrder(createdOrder);
+  }
+
+  async createWithAddress(
+    orderData: Omit<Order, 'id' | 'createdAt' | 'updatedAt'>,
+    addressData: Omit<OrderAddress, 'id' | 'orderId'>,
+  ): Promise<Order> {
+    const { orderItems, ...order } = orderData;
+
+    const createdOrder = await this.prisma.order.create({
+      data: {
+        ...order,
+        OrderItem: {
+          create: orderItems.map((item) => ({
+            quantity: item.quantity,
+            price: item.price,
+            size: item.size as Size,
+            productId: item.productId,
+          })),
+        },
+        OrderAddress: {
+          create: {
+            firstName: addressData.firstName,
+            lastName: addressData.lastName,
+            address: addressData.address,
+            address2: addressData.address2,
+            postalCode: addressData.postalCode,
+            city: addressData.city,
+            phone: addressData.phone,
+            countryId: addressData.countryId,
+          },
         },
       },
       include: {
@@ -146,6 +190,18 @@ export class PrismaOrderRepository implements OrderRepository {
       productId: string;
       orderId: string;
     }>;
+    OrderAddress?: {
+      id: string;
+      firstName: string;
+      lastName: string;
+      address: string;
+      address2: string | null;
+      postalCode: string;
+      city: string;
+      phone: string;
+      countryId: string;
+      orderId: string;
+    } | null;
     createdAt: Date;
     updatedAt: Date;
   }): Order {
@@ -168,6 +224,20 @@ export class PrismaOrderRepository implements OrderRepository {
           productId: item.productId,
           orderId: item.orderId,
         })) || [],
+      orderAddress: order.OrderAddress
+        ? {
+            id: order.OrderAddress.id,
+            firstName: order.OrderAddress.firstName,
+            lastName: order.OrderAddress.lastName,
+            address: order.OrderAddress.address,
+            address2: order.OrderAddress.address2 || undefined,
+            postalCode: order.OrderAddress.postalCode,
+            city: order.OrderAddress.city,
+            phone: order.OrderAddress.phone,
+            countryId: order.OrderAddress.countryId,
+            orderId: order.OrderAddress.orderId,
+          }
+        : undefined,
       createdAt: order.createdAt,
       updatedAt: order.updatedAt,
     };

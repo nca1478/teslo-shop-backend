@@ -1,3 +1,5 @@
+import { OrderAddress } from './address.entity';
+
 export interface OrderItem {
   id: string;
   quantity: number;
@@ -18,6 +20,7 @@ export interface Order {
   transactionId?: string;
   userId: string;
   orderItems: OrderItem[];
+  orderAddress?: OrderAddress;
   createdAt: Date;
   updatedAt: Date;
 }
