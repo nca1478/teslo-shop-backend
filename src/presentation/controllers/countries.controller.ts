@@ -5,12 +5,12 @@ import { GetCountriesUseCase } from '../../application/use-cases/countries/get-c
 @ApiTags('Countries')
 @Controller('countries')
 export class CountriesController {
-  constructor(private readonly getCountriesUseCase: GetCountriesUseCase) {}
+    constructor(private readonly getCountriesUseCase: GetCountriesUseCase) {}
 
-  @Get()
-  @ApiOperation({ summary: 'Get all countries' })
-  @ApiResponse({ status: 200, description: 'Countries retrieved successfully' })
-  async getCountries() {
-    return this.getCountriesUseCase.execute();
-  }
+    @Get()
+    @ApiOperation({ summary: 'Get all countries' })
+    @ApiResponse({ status: 200, description: 'Countries retrieved successfully' })
+    async getCountries() {
+        return this.getCountriesUseCase.execute();
+    }
 }

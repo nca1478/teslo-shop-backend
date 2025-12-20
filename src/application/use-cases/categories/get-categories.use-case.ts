@@ -5,12 +5,12 @@ import { INJECTION_TOKENS } from '../../../shared/constants/injection-tokens';
 
 @Injectable()
 export class GetCategoriesUseCase {
-  constructor(
-    @Inject(INJECTION_TOKENS.CATEGORY_REPOSITORY)
-    private readonly categoryRepository: CategoryRepository,
-  ) {}
+    constructor(
+        @Inject(INJECTION_TOKENS.CATEGORY_REPOSITORY)
+        private readonly categoryRepository: CategoryRepository,
+    ) {}
 
-  async execute(): Promise<Category[]> {
-    return this.categoryRepository.findAll();
-  }
+    async execute(): Promise<Category[]> {
+        return this.categoryRepository.findAll();
+    }
 }

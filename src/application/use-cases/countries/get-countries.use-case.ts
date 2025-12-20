@@ -5,12 +5,12 @@ import { INJECTION_TOKENS } from '../../../shared/constants/injection-tokens';
 
 @Injectable()
 export class GetCountriesUseCase {
-  constructor(
-    @Inject(INJECTION_TOKENS.COUNTRY_REPOSITORY)
-    private readonly countryRepository: CountryRepository,
-  ) {}
+    constructor(
+        @Inject(INJECTION_TOKENS.COUNTRY_REPOSITORY)
+        private readonly countryRepository: CountryRepository,
+    ) {}
 
-  async execute(): Promise<Country[]> {
-    return this.countryRepository.findAll();
-  }
+    async execute(): Promise<Country[]> {
+        return this.countryRepository.findAll();
+    }
 }

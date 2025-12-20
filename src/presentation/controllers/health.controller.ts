@@ -5,31 +5,31 @@ import { PrismaService } from '../../infrastructure/database/prisma.service';
 @ApiTags('Health')
 @Controller('health')
 export class HealthController {
-  constructor(private readonly prisma: PrismaService) {}
+    constructor(private readonly prisma: PrismaService) {}
 
-  @Get()
-  @ApiOperation({ summary: 'Health check endpoint' })
-  @ApiResponse({ status: 200, description: 'Service is healthy' })
-  @ApiResponse({ status: 503, description: 'Service is unhealthy' })
-  async check() {
-    try {
-      // Check database connection
-      await this.prisma.$queryRaw`SELECT 1`;
+    @Get()
+    @ApiOperation({ summary: 'Health check endpoint' })
+    @ApiResponse({ status: 200, description: 'Service is healthy' })
+    @ApiResponse({ status: 503, description: 'Service is unhealthy' })
+    async check() {
+        try {
+            // Check database connection
+            await this.prisma.$queryRaw`SELECT 1`;
 
-      return {
-        status: 'ok',
-        timestamp: new Date().toISOString(),
-        uptime: process.uptime(),
-        database: 'connected',
-      };
-    } catch (error) {
-      return {
-        status: 'error',
-        timestamp: new Date().toISOString(),
-        uptime: process.uptime(),
-        database: 'disconnected',
-        error: error instanceof Error ? error.message : 'Unknown error',
-      };
+            return {
+                status: 'ok',
+                timestamp: new Date().toISOString(),
+                uptime: process.uptime(),
+                database: 'connected',
+            };
+        } catch (error) {
+            return {
+                status: 'error',
+                timestamp: new Date().toISOString(),
+                uptime: process.uptime(),
+                database: 'disconnected',
+                error: error instanceof Error ? error.message : 'Unknown error',
+            };
+        }
     }
-  }
 }

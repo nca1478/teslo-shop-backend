@@ -5,18 +5,18 @@ import { INJECTION_TOKENS } from '../../../shared/constants/injection-tokens';
 
 @Injectable()
 export class DeleteProductUseCase {
-  constructor(
-    @Inject(INJECTION_TOKENS.PRODUCT_REPOSITORY)
-    private readonly productRepository: ProductRepository,
-  ) {}
+    constructor(
+        @Inject(INJECTION_TOKENS.PRODUCT_REPOSITORY)
+        private readonly productRepository: ProductRepository,
+    ) {}
 
-  async execute(id: string): Promise<void> {
-    // Check if product exists
-    const existingProduct = await this.productRepository.findById(id);
-    if (!existingProduct) {
-      throw new NotFoundDomainException('Product', id);
+    async execute(id: string): Promise<void> {
+        // Check if product exists
+        const existingProduct = await this.productRepository.findById(id);
+        if (!existingProduct) {
+            throw new NotFoundDomainException('Product', id);
+        }
+
+        await this.productRepository.delete(id);
     }
-
-    await this.productRepository.delete(id);
-  }
 }

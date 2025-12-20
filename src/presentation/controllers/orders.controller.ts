@@ -1,18 +1,5 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Query,
-  Param,
-  Body,
-  UseGuards,
-} from '@nestjs/common';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiResponse,
-  ApiBearerAuth,
-} from '@nestjs/swagger';
+import { Controller, Get, Post, Query, Param, Body, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { PlaceOrderUseCase } from '../../application/use-cases/orders/place-order.use-case';
 import { GetOrderByIdUseCase } from '../../application/use-cases/orders/get-order-by-id.use-case';
 import { GetOrdersByUserUseCase } from '../../application/use-cases/orders/get-orders-by-user.use-case';
@@ -31,49 +18,46 @@ import type { User } from '../../domain/entities/user.entity';
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 export class OrdersController {
-  constructor(
-    private readonly placeOrderUseCase: PlaceOrderUseCase,
-    private readonly getOrderByIdUseCase: GetOrderByIdUseCase,
-    private readonly getOrdersByUserUseCase: GetOrdersByUserUseCase,
-    private readonly getPaginatedOrdersUseCase: GetPaginatedOrdersUseCase,
-  ) {}
+    constructor(
+        private readonly placeOrderUseCase: PlaceOrderUseCase,
+        private readonly getOrderByIdUseCase: GetOrderByIdUseCase,
+        private readonly getOrdersByUserUseCase: GetOrdersByUserUseCase,
+        private readonly getPaginatedOrdersUseCase: GetPaginatedOrdersUseCase,
+    ) {}
 
-  @Post()
-  @ApiOperation({ summary: 'Place a new order' })
-  @ApiResponse({ status: 201, description: 'Order placed successfully' })
-  @ApiResponse({ status: 400, description: 'Bad request' })
-  async placeOrder(
-    @Body() placeOrderDto: PlaceOrderDto,
-    @GetUser() user: User,
-  ) {
-    return this.placeOrderUseCase.execute({
-      ...placeOrderDto,
-      userId: user.id,
-    });
-  }
+    @Post()
+    @ApiOperation({ summary: 'Place a new order' })
+    @ApiResponse({ status: 201, description: 'Order placed successfully' })
+    @ApiResponse({ status: 400, description: 'Bad request' })
+    async placeOrder(@Body() placeOrderDto: PlaceOrderDto, @GetUser() user: User) {
+        return this.placeOrderUseCase.execute({
+            ...placeOrderDto,
+            userId: user.id,
+        });
+    }
 
-  @Get('my-orders')
-  @ApiOperation({ summary: 'Get current user orders' })
-  @ApiResponse({ status: 200, description: 'Orders retrieved successfully' })
-  async getMyOrders(@GetUser() user: User) {
-    return this.getOrdersByUserUseCase.execute(user.id);
-  }
+    @Get('my-orders')
+    @ApiOperation({ summary: 'Get current user orders' })
+    @ApiResponse({ status: 200, description: 'Orders retrieved successfully' })
+    async getMyOrders(@GetUser() user: User) {
+        return this.getOrdersByUserUseCase.execute(user.id);
+    }
 
-  @Get()
-  @UseGuards(RolesGuard)
-  @Roles(Role.ADMIN)
-  @ApiOperation({ summary: 'Get all orders with pagination (Admin only)' })
-  @ApiResponse({ status: 200, description: 'Orders retrieved successfully' })
-  @ApiResponse({ status: 403, description: 'Forbidden - Admin role required' })
-  async getAllOrders(@Query() paginationDto: PaginationDto) {
-    return this.getPaginatedOrdersUseCase.execute(paginationDto);
-  }
+    @Get()
+    @UseGuards(RolesGuard)
+    @Roles(Role.ADMIN)
+    @ApiOperation({ summary: 'Get all orders with pagination (Admin only)' })
+    @ApiResponse({ status: 200, description: 'Orders retrieved successfully' })
+    @ApiResponse({ status: 403, description: 'Forbidden - Admin role required' })
+    async getAllOrders(@Query() paginationDto: PaginationDto) {
+        return this.getPaginatedOrdersUseCase.execute(paginationDto);
+    }
 
-  @Get(':id')
-  @ApiOperation({ summary: 'Get order by ID' })
-  @ApiResponse({ status: 200, description: 'Order retrieved successfully' })
-  @ApiResponse({ status: 404, description: 'Order not found' })
-  async getOrderById(@Param('id') id: string) {
-    return this.getOrderByIdUseCase.execute(id);
-  }
+    @Get(':id')
+    @ApiOperation({ summary: 'Get order by ID' })
+    @ApiResponse({ status: 200, description: 'Order retrieved successfully' })
+    @ApiResponse({ status: 404, description: 'Order not found' })
+    async getOrderById(@Param('id') id: string) {
+        return this.getOrderByIdUseCase.execute(id);
+    }
 }

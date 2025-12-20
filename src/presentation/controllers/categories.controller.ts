@@ -5,15 +5,15 @@ import { GetCategoriesUseCase } from '../../application/use-cases/categories/get
 @ApiTags('Categories')
 @Controller('categories')
 export class CategoriesController {
-  constructor(private readonly getCategoriesUseCase: GetCategoriesUseCase) {}
+    constructor(private readonly getCategoriesUseCase: GetCategoriesUseCase) {}
 
-  @Get()
-  @ApiOperation({ summary: 'Get all categories' })
-  @ApiResponse({
-    status: 200,
-    description: 'Categories retrieved successfully',
-  })
-  async getCategories() {
-    return this.getCategoriesUseCase.execute();
-  }
+    @Get()
+    @ApiOperation({ summary: 'Get all categories' })
+    @ApiResponse({
+        status: 200,
+        description: 'Categories retrieved successfully',
+    })
+    async getCategories() {
+        return this.getCategoriesUseCase.execute();
+    }
 }

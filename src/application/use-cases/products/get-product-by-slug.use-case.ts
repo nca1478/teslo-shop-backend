@@ -6,18 +6,18 @@ import { INJECTION_TOKENS } from '../../../shared/constants/injection-tokens';
 
 @Injectable()
 export class GetProductBySlugUseCase {
-  constructor(
-    @Inject(INJECTION_TOKENS.PRODUCT_REPOSITORY)
-    private readonly productRepository: ProductRepository,
-  ) {}
+    constructor(
+        @Inject(INJECTION_TOKENS.PRODUCT_REPOSITORY)
+        private readonly productRepository: ProductRepository,
+    ) {}
 
-  async execute(slug: string): Promise<Product> {
-    const product = await this.productRepository.findBySlug(slug);
+    async execute(slug: string): Promise<Product> {
+        const product = await this.productRepository.findBySlug(slug);
 
-    if (!product) {
-      throw new NotFoundDomainException('Product', slug);
+        if (!product) {
+            throw new NotFoundDomainException('Product', slug);
+        }
+
+        return product;
     }
-
-    return product;
-  }
 }

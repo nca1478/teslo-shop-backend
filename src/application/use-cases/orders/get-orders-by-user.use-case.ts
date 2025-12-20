@@ -5,12 +5,12 @@ import { INJECTION_TOKENS } from '../../../shared/constants/injection-tokens';
 
 @Injectable()
 export class GetOrdersByUserUseCase {
-  constructor(
-    @Inject(INJECTION_TOKENS.ORDER_REPOSITORY)
-    private readonly orderRepository: OrderRepository,
-  ) {}
+    constructor(
+        @Inject(INJECTION_TOKENS.ORDER_REPOSITORY)
+        private readonly orderRepository: OrderRepository,
+    ) {}
 
-  async execute(userId: string): Promise<Order[]> {
-    return this.orderRepository.findByUserId(userId);
-  }
+    async execute(userId: string): Promise<Order[]> {
+        return this.orderRepository.findByUserId(userId);
+    }
 }

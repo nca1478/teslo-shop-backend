@@ -4,39 +4,37 @@ import { Order } from '../../../domain/entities/order.entity';
 import { INJECTION_TOKENS } from '../../../shared/constants/injection-tokens';
 
 export interface GetPaginatedOrdersRequest {
-  page?: number;
-  limit?: number;
+    page?: number;
+    limit?: number;
 }
 
 export interface GetPaginatedOrdersResponse {
-  orders: Order[];
-  total: number;
-  page: number;
-  limit: number;
-  totalPages: number;
+    orders: Order[];
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
 }
 
 @Injectable()
 export class GetPaginatedOrdersUseCase {
-  constructor(
-    @Inject(INJECTION_TOKENS.ORDER_REPOSITORY)
-    private readonly orderRepository: OrderRepository,
-  ) {}
+    constructor(
+        @Inject(INJECTION_TOKENS.ORDER_REPOSITORY)
+        private readonly orderRepository: OrderRepository,
+    ) {}
 
-  async execute(
-    request: GetPaginatedOrdersRequest,
-  ): Promise<GetPaginatedOrdersResponse> {
-    const { page = 1, limit = 10 } = request;
+    async execute(request: GetPaginatedOrdersRequest): Promise<GetPaginatedOrdersResponse> {
+        const { page = 1, limit = 10 } = request;
 
-    const { orders, total } = await this.orderRepository.findAll(page, limit);
-    const totalPages = Math.ceil(total / limit);
+        const { orders, total } = await this.orderRepository.findAll(page, limit);
+        const totalPages = Math.ceil(total / limit);
 
-    return {
-      orders,
-      total,
-      page,
-      limit,
-      totalPages,
-    };
-  }
+        return {
+            orders,
+            total,
+            page,
+            limit,
+            totalPages,
+        };
+    }
 }

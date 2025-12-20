@@ -1,25 +1,25 @@
 import { ValidationDomainException } from '../exceptions/domain.exception';
 
 export class Email {
-  private readonly value: string;
+    private readonly value: string;
 
-  constructor(email: string) {
-    if (!this.isValid(email)) {
-      throw new ValidationDomainException('Invalid email format');
+    constructor(email: string) {
+        if (!this.isValid(email)) {
+            throw new ValidationDomainException('Invalid email format');
+        }
+        this.value = email.toLowerCase().trim();
     }
-    this.value = email.toLowerCase().trim();
-  }
 
-  getValue(): string {
-    return this.value;
-  }
+    getValue(): string {
+        return this.value;
+    }
 
-  private isValid(email: string): boolean {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  }
+    private isValid(email: string): boolean {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    }
 
-  equals(other: Email): boolean {
-    return this.value === other.value;
-  }
+    equals(other: Email): boolean {
+        return this.value === other.value;
+    }
 }

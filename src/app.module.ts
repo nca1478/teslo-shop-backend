@@ -72,114 +72,114 @@ import databaseConfig from './infrastructure/config/database.config';
 import jwtConfig from './infrastructure/config/jwt.config';
 
 @Module({
-  imports: [
-    ConfigModule.forRoot({
-      isGlobal: true,
-      load: [databaseConfig, jwtConfig],
-    }),
-    PassportModule.register({ defaultStrategy: 'jwt' }),
-    JwtModule.registerAsync({
-      useFactory: () => ({
-        secret: process.env.JWT_SECRET || 'your-secret-key',
-        signOptions: { expiresIn: '24h' },
-      }),
-    }),
-  ],
-  controllers: [
-    AuthController,
-    ProductsController,
-    OrdersController,
-    UsersController,
-    CategoriesController,
-    CountriesController,
-    AddressesController,
-    PaymentsController,
-    HealthController,
-  ],
-  providers: [
-    PrismaService,
-    JwtStrategy,
+    imports: [
+        ConfigModule.forRoot({
+            isGlobal: true,
+            load: [databaseConfig, jwtConfig],
+        }),
+        PassportModule.register({ defaultStrategy: 'jwt' }),
+        JwtModule.registerAsync({
+            useFactory: () => ({
+                secret: process.env.JWT_SECRET || 'your-secret-key',
+                signOptions: { expiresIn: '24h' },
+            }),
+        }),
+    ],
+    controllers: [
+        AuthController,
+        ProductsController,
+        OrdersController,
+        UsersController,
+        CategoriesController,
+        CountriesController,
+        AddressesController,
+        PaymentsController,
+        HealthController,
+    ],
+    providers: [
+        PrismaService,
+        JwtStrategy,
 
-    // Global Exception Filter
-    {
-      provide: APP_FILTER,
-      useClass: HttpExceptionFilter,
-    },
+        // Global Exception Filter
+        {
+            provide: APP_FILTER,
+            useClass: HttpExceptionFilter,
+        },
 
-    // Repositories
-    {
-      provide: INJECTION_TOKENS.USER_REPOSITORY,
-      useClass: PrismaUserRepository,
-    },
-    {
-      provide: INJECTION_TOKENS.PRODUCT_REPOSITORY,
-      useClass: PrismaProductRepository,
-    },
-    {
-      provide: INJECTION_TOKENS.ORDER_REPOSITORY,
-      useClass: PrismaOrderRepository,
-    },
-    {
-      provide: INJECTION_TOKENS.CATEGORY_REPOSITORY,
-      useClass: PrismaCategoryRepository,
-    },
-    {
-      provide: INJECTION_TOKENS.COUNTRY_REPOSITORY,
-      useClass: PrismaCountryRepository,
-    },
-    {
-      provide: INJECTION_TOKENS.ADDRESS_REPOSITORY,
-      useClass: PrismaAddressRepository,
-    },
+        // Repositories
+        {
+            provide: INJECTION_TOKENS.USER_REPOSITORY,
+            useClass: PrismaUserRepository,
+        },
+        {
+            provide: INJECTION_TOKENS.PRODUCT_REPOSITORY,
+            useClass: PrismaProductRepository,
+        },
+        {
+            provide: INJECTION_TOKENS.ORDER_REPOSITORY,
+            useClass: PrismaOrderRepository,
+        },
+        {
+            provide: INJECTION_TOKENS.CATEGORY_REPOSITORY,
+            useClass: PrismaCategoryRepository,
+        },
+        {
+            provide: INJECTION_TOKENS.COUNTRY_REPOSITORY,
+            useClass: PrismaCountryRepository,
+        },
+        {
+            provide: INJECTION_TOKENS.ADDRESS_REPOSITORY,
+            useClass: PrismaAddressRepository,
+        },
 
-    // Services
-    {
-      provide: INJECTION_TOKENS.AUTH_SERVICE,
-      useClass: JwtAuthService,
-    },
-    {
-      provide: INJECTION_TOKENS.PAYPAL_SERVICE,
-      useClass: PayPalAdapter,
-    },
-    {
-      provide: INJECTION_TOKENS.FILE_UPLOAD_SERVICE,
-      useClass: CloudinaryAdapter,
-    },
+        // Services
+        {
+            provide: INJECTION_TOKENS.AUTH_SERVICE,
+            useClass: JwtAuthService,
+        },
+        {
+            provide: INJECTION_TOKENS.PAYPAL_SERVICE,
+            useClass: PayPalAdapter,
+        },
+        {
+            provide: INJECTION_TOKENS.FILE_UPLOAD_SERVICE,
+            useClass: CloudinaryAdapter,
+        },
 
-    // Auth Use Cases
-    LoginUseCase,
-    RegisterUseCase,
+        // Auth Use Cases
+        LoginUseCase,
+        RegisterUseCase,
 
-    // Product Use Cases
-    GetProductsUseCase,
-    GetProductBySlugUseCase,
-    CreateProductUseCase,
-    UpdateProductUseCase,
-    DeleteProductUseCase,
-    DeleteProductImageUseCase,
+        // Product Use Cases
+        GetProductsUseCase,
+        GetProductBySlugUseCase,
+        CreateProductUseCase,
+        UpdateProductUseCase,
+        DeleteProductUseCase,
+        DeleteProductImageUseCase,
 
-    // Order Use Cases
-    PlaceOrderUseCase,
-    GetOrderByIdUseCase,
-    GetOrdersByUserUseCase,
-    GetPaginatedOrdersUseCase,
+        // Order Use Cases
+        PlaceOrderUseCase,
+        GetOrderByIdUseCase,
+        GetOrdersByUserUseCase,
+        GetPaginatedOrdersUseCase,
 
-    // User Use Cases
-    GetPaginatedUsersUseCase,
-    ChangeUserRoleUseCase,
+        // User Use Cases
+        GetPaginatedUsersUseCase,
+        ChangeUserRoleUseCase,
 
-    // Category & Country Use Cases
-    GetCategoriesUseCase,
-    GetCountriesUseCase,
+        // Category & Country Use Cases
+        GetCategoriesUseCase,
+        GetCountriesUseCase,
 
-    // Address Use Cases
-    SetUserAddressUseCase,
-    GetUserAddressUseCase,
-    DeleteUserAddressUseCase,
+        // Address Use Cases
+        SetUserAddressUseCase,
+        GetUserAddressUseCase,
+        DeleteUserAddressUseCase,
 
-    // Payment Use Cases
-    SetTransactionIdUseCase,
-    PayPalCheckPaymentUseCase,
-  ],
+        // Payment Use Cases
+        SetTransactionIdUseCase,
+        PayPalCheckPaymentUseCase,
+    ],
 })
 export class AppModule {}

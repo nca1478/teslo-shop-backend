@@ -5,31 +5,31 @@ import { PrismaService } from '../../database/prisma.service';
 
 @Injectable()
 export class PrismaCountryRepository implements CountryRepository {
-  constructor(private readonly prisma: PrismaService) {}
+    constructor(private readonly prisma: PrismaService) {}
 
-  async findAll(): Promise<Country[]> {
-    const countries = await this.prisma.country.findMany({
-      orderBy: {
-        name: 'asc',
-      },
-    });
+    async findAll(): Promise<Country[]> {
+        const countries = await this.prisma.country.findMany({
+            orderBy: {
+                name: 'asc',
+            },
+        });
 
-    return countries.map((country) => ({
-      id: country.id,
-      name: country.name,
-    }));
-  }
+        return countries.map((country) => ({
+            id: country.id,
+            name: country.name,
+        }));
+    }
 
-  async findById(id: string): Promise<Country | null> {
-    const country = await this.prisma.country.findUnique({
-      where: { id },
-    });
+    async findById(id: string): Promise<Country | null> {
+        const country = await this.prisma.country.findUnique({
+            where: { id },
+        });
 
-    if (!country) return null;
+        if (!country) return null;
 
-    return {
-      id: country.id,
-      name: country.name,
-    };
-  }
+        return {
+            id: country.id,
+            name: country.name,
+        };
+    }
 }

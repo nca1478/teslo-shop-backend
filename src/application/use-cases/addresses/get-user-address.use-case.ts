@@ -5,12 +5,12 @@ import { INJECTION_TOKENS } from '../../../shared/constants/injection-tokens';
 
 @Injectable()
 export class GetUserAddressUseCase {
-  constructor(
-    @Inject(INJECTION_TOKENS.ADDRESS_REPOSITORY)
-    private readonly addressRepository: AddressRepository,
-  ) {}
+    constructor(
+        @Inject(INJECTION_TOKENS.ADDRESS_REPOSITORY)
+        private readonly addressRepository: AddressRepository,
+    ) {}
 
-  async execute(userId: string): Promise<UserAddress | null> {
-    return this.addressRepository.findByUserId(userId);
-  }
+    async execute(userId: string): Promise<UserAddress | null> {
+        return this.addressRepository.findByUserId(userId);
+    }
 }

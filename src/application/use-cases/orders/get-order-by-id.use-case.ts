@@ -6,18 +6,18 @@ import { INJECTION_TOKENS } from '../../../shared/constants/injection-tokens';
 
 @Injectable()
 export class GetOrderByIdUseCase {
-  constructor(
-    @Inject(INJECTION_TOKENS.ORDER_REPOSITORY)
-    private readonly orderRepository: OrderRepository,
-  ) {}
+    constructor(
+        @Inject(INJECTION_TOKENS.ORDER_REPOSITORY)
+        private readonly orderRepository: OrderRepository,
+    ) {}
 
-  async execute(id: string): Promise<Order> {
-    const order = await this.orderRepository.findById(id);
+    async execute(id: string): Promise<Order> {
+        const order = await this.orderRepository.findById(id);
 
-    if (!order) {
-      throw new NotFoundDomainException('Order', id);
+        if (!order) {
+            throw new NotFoundDomainException('Order', id);
+        }
+
+        return order;
     }
-
-    return order;
-  }
 }
