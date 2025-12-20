@@ -1,6 +1,5 @@
 import { Injectable, Inject } from '@nestjs/common';
 import type { UserRepository } from '../../ports/repositories/user.repository';
-import { User } from '../../../domain/entities/user.entity';
 import { INJECTION_TOKENS } from '../../../shared/constants/injection-tokens';
 
 export interface GetPaginatedUsersRequest {

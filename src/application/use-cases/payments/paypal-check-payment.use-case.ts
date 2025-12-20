@@ -31,9 +31,7 @@ export class PayPalCheckPaymentUseCase {
       throw new ValidationDomainException('Payment not completed');
     }
 
-    const orderId = paymentDetails.payer.payer_id;
-
-    let order =
+    const order =
       await this.orderRepository.findByTransactionId(paypalTransactionId);
 
     if (!order) {
