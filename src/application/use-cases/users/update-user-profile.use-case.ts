@@ -41,6 +41,7 @@ export class UpdateUserProfileUseCase {
         const updatedUser = await this.userRepository.update(userId, updateData);
 
         // Remove password from response
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { password, ...userWithoutPassword } = updatedUser;
 
         return userWithoutPassword;
