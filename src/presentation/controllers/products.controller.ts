@@ -16,9 +16,11 @@ import { CreateProductUseCase } from '../../application/use-cases/products/creat
 import { UpdateProductUseCase } from '../../application/use-cases/products/update-product.use-case';
 import { DeleteProductUseCase } from '../../application/use-cases/products/delete-product.use-case';
 import { DeleteProductImageUseCase } from '../../application/use-cases/products/delete-product-image.use-case';
+import { SearchProductsUseCase } from '../../application/use-cases/products/search-products.use-case';
 import { GetProductsDto } from '../../application/dtos/products/get-products.dto';
 import { CreateProductDto } from '../../application/dtos/products/create-product.dto';
 import { UpdateProductDto } from '../../application/dtos/products/update-product.dto';
+import { SearchProductsDto } from '../../application/dtos/products/search-products.dto';
 import { JwtAuthGuard } from '../../infrastructure/adapters/auth/jwt-auth.guard';
 import { RolesGuard } from '../../infrastructure/adapters/auth/roles.guard';
 import { Roles } from '../../shared/decorators/roles.decorator';
@@ -36,6 +38,7 @@ export class ProductsController {
         private readonly updateProductUseCase: UpdateProductUseCase,
         private readonly deleteProductUseCase: DeleteProductUseCase,
         private readonly deleteProductImageUseCase: DeleteProductImageUseCase,
+        private readonly searchProductsUseCase: SearchProductsUseCase,
     ) {}
 
     @Get()
@@ -43,6 +46,13 @@ export class ProductsController {
     @ApiResponse({ status: 200, description: 'Products retrieved successfully' })
     async getProducts(@Query() getProductsDto: GetProductsDto) {
         return this.getProductsUseCase.execute(getProductsDto);
+    }
+
+    @Get('search')
+    @ApiOperation({ summary: 'Search products by title' })
+    @ApiResponse({ status: 200, description: 'Products search results retrieved successfully' })
+    async searchProducts(@Query() searchProductsDto: SearchProductsDto) {
+        return this.searchProductsUseCase.execute(searchProductsDto);
     }
 
     @Get(':slug')

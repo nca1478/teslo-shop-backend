@@ -225,6 +225,41 @@ export class PrismaProductRepository implements ProductRepository {
         });
     }
 
+    async searchByTitle(
+        searchTerm: string,
+        pagination: { page: number; limit: number },
+    ): Promise<{ products: Product[]; total: number }> {
+        const { page, limit } = pagination;
+
+        const where = {
+            title: {
+                contains: searchTerm,
+                mode: 'insensitive' as const,
+            },
+        };
+
+        const [products, total] = await Promise.all([
+            this.prisma.product.findMany({
+                where,
+                skip: (page - 1) * limit,
+                take: limit,
+                orderBy: {
+                    title: 'asc',
+                },
+                include: {
+                    ProductImage: true,
+                    Category: true,
+                },
+            }),
+            this.prisma.product.count({ where }),
+        ]);
+
+        return {
+            products: products.map((product) => this.mapToProduct(product)),
+            total,
+        };
+    }
+
     private mapToProduct(product: {
         id: string;
         title: string;

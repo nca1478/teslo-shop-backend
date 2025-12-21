@@ -29,6 +29,7 @@ import { CreateProductUseCase } from './application/use-cases/products/create-pr
 import { UpdateProductUseCase } from './application/use-cases/products/update-product.use-case';
 import { DeleteProductUseCase } from './application/use-cases/products/delete-product.use-case';
 import { DeleteProductImageUseCase } from './application/use-cases/products/delete-product-image.use-case';
+import { SearchProductsUseCase } from './application/use-cases/products/search-products.use-case';
 
 // Application - Orders
 import { PlaceOrderUseCase } from './application/use-cases/orders/place-order.use-case';
@@ -39,6 +40,8 @@ import { GetPaginatedOrdersUseCase } from './application/use-cases/orders/get-pa
 // Application - Users
 import { GetPaginatedUsersUseCase } from './application/use-cases/users/get-paginated-users.use-case';
 import { ChangeUserRoleUseCase } from './application/use-cases/users/change-user-role.use-case';
+import { GetUserProfileUseCase } from './application/use-cases/users/get-user-profile.use-case';
+import { UpdateUserProfileUseCase } from './application/use-cases/users/update-user-profile.use-case';
 
 // Application - Categories & Countries
 import { GetCategoriesUseCase } from './application/use-cases/categories/get-categories.use-case';
@@ -157,6 +160,7 @@ import jwtConfig from './infrastructure/config/jwt.config';
         UpdateProductUseCase,
         DeleteProductUseCase,
         DeleteProductImageUseCase,
+        SearchProductsUseCase,
 
         // Order Use Cases
         PlaceOrderUseCase,
@@ -167,6 +171,8 @@ import jwtConfig from './infrastructure/config/jwt.config';
         // User Use Cases
         GetPaginatedUsersUseCase,
         ChangeUserRoleUseCase,
+        GetUserProfileUseCase,
+        UpdateUserProfileUseCase,
 
         // Category & Country Use Cases
         GetCategoriesUseCase,

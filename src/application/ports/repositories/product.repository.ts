@@ -16,5 +16,9 @@ export interface ProductRepository {
         sortBy?: string;
         sortOrder?: 'asc' | 'desc';
     }): Promise<{ products: Product[]; total: number }>;
+    searchByTitle(
+        searchTerm: string,
+        pagination: { page: number; limit: number },
+    ): Promise<{ products: Product[]; total: number }>;
     updateStock(id: string, quantity: number): Promise<void>;
 }
