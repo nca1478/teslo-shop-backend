@@ -22,37 +22,39 @@ const prisma = new PrismaClient({ adapter });
 async function main() {
   console.log('🌱 Starting seed process...');
 
-  // 1. Clean existing data
-  console.log('🧹 Cleaning existing data...');
+  // 1. Upsert users (keyed by email)
+  console.log('👥 Seeding users...');
+  for (const user of users) {
+    await prisma.user.upsert({
+      where: { email: user.email },
+      update: {
+        name: user.name,
+        password: user.password,
+        role: user.role,
+      },
+      create: user,
+    });
+  }
 
-  // Delete in order to respect foreign key constraints
-  await prisma.orderAddress.deleteMany();
-  await prisma.orderItem.deleteMany();
-  await prisma.order.deleteMany();
-  await prisma.userAddress.deleteMany();
-  await prisma.user.deleteMany();
-  await prisma.productImage.deleteMany();
-  await prisma.product.deleteMany();
-  await prisma.category.deleteMany();
-  await prisma.country.deleteMany();
+  // 2. Upsert countries (keyed by id)
+  console.log('🌍 Seeding countries...');
+  for (const country of countries) {
+    await prisma.country.upsert({
+      where: { id: country.id },
+      update: { name: country.name },
+      create: country,
+    });
+  }
 
-  // 2. Create users
-  console.log('👥 Creating users...');
-  await prisma.user.createMany({
-    data: users,
-  });
-
-  // 3. Create countries
-  console.log('🌍 Creating countries...');
-  await prisma.country.createMany({
-    data: countries,
-  });
-
-  // 4. Create categories
-  console.log('📂 Creating categories...');
-  await prisma.category.createMany({
-    data: categories,
-  });
+  // 3. Upsert categories (keyed by name)
+  console.log('📂 Seeding categories...');
+  for (const category of categories) {
+    await prisma.category.upsert({
+      where: { name: category.name },
+      update: {},
+      create: category,
+    });
+  }
 
   // Get categories for mapping
   const dbCategories = await prisma.category.findMany();
@@ -64,31 +66,34 @@ async function main() {
     {} as Record<string, string>,
   );
 
-  // 5. Create products with images
-  console.log('🛍️ Creating products...');
+  // 4. Upsert products (keyed by slug) with their images
+  console.log('🛍️ Seeding products...');
   for (const productData of products) {
     const { images, categoryType, ...product } = productData;
 
-    const dbProduct = await prisma.product.create({
-      data: {
+    const dbProduct = await prisma.product.upsert({
+      where: { slug: product.slug },
+      update: {
+        ...product,
+        categoryId: categoriesMap[categoryType],
+      },
+      create: {
         ...product,
         categoryId: categoriesMap[categoryType],
       },
     });
 
-    // Create product images
-    const imagesData = images.map((url) => ({
-      url,
-      productId: dbProduct.id,
-    }));
-
+    // Replace this product's images so they stay in sync with the seed data
+    await prisma.productImage.deleteMany({
+      where: { productId: dbProduct.id },
+    });
     await prisma.productImage.createMany({
-      data: imagesData,
+      data: images.map((url) => ({ url, productId: dbProduct.id })),
     });
   }
 
   console.log('✅ Seed completed successfully');
-  console.log(`📊 Created:`);
+  console.log(`📊 Seeded:`);
   console.log(`   - ${users.length} users`);
   console.log(`   - ${countries.length} countries`);
   console.log(`   - ${categories.length} categories`);
