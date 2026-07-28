@@ -10,7 +10,9 @@ export class NodemailerEmailAdapter implements EmailService {
 
     constructor(private readonly configService: ConfigService) {
         this.transporter = nodemailer.createTransport({
-            service: 'gmail',
+            host: this.configService.get('email.host'),
+            port: this.configService.get('email.port'),
+            secure: this.configService.get('email.secure'),
             auth: {
                 user: this.configService.get('email.user'),
                 pass: this.configService.get('email.pass'),
