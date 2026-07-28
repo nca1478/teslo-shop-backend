@@ -17,10 +17,14 @@ import { JwtStrategy } from './infrastructure/adapters/auth/jwt.strategy';
 import { HttpExceptionFilter } from './infrastructure/common/filters/http-exception.filter';
 import { PayPalAdapter } from './infrastructure/adapters/external/paypal.adapter';
 import { CloudinaryAdapter } from './infrastructure/adapters/external/cloudinary.adapter';
+import { NodemailerEmailAdapter } from './infrastructure/adapters/email/nodemailer-email.adapter';
 
 // Application - Auth
 import { LoginUseCase } from './application/use-cases/auth/login.use-case';
 import { RegisterUseCase } from './application/use-cases/auth/register.use-case';
+import { RequestOtpUseCase } from './application/use-cases/auth/request-otp.use-case';
+import { VerifyOtpUseCase } from './application/use-cases/auth/verify-otp.use-case';
+import { ResetPasswordUseCase } from './application/use-cases/auth/reset-password.use-case';
 
 // Application - Products
 import { GetProductsUseCase } from './application/use-cases/products/get-products.use-case';
@@ -73,12 +77,13 @@ import { INJECTION_TOKENS } from './shared/constants/injection-tokens';
 // Config
 import databaseConfig from './infrastructure/config/database.config';
 import jwtConfig from './infrastructure/config/jwt.config';
+import emailConfig from './infrastructure/config/email.config';
 
 @Module({
     imports: [
         ConfigModule.forRoot({
             isGlobal: true,
-            load: [databaseConfig, jwtConfig],
+            load: [databaseConfig, jwtConfig, emailConfig],
         }),
         PassportModule.register({ defaultStrategy: 'jwt' }),
         JwtModule.registerAsync({
@@ -148,10 +153,17 @@ import jwtConfig from './infrastructure/config/jwt.config';
             provide: INJECTION_TOKENS.FILE_UPLOAD_SERVICE,
             useClass: CloudinaryAdapter,
         },
+        {
+            provide: INJECTION_TOKENS.EMAIL_SERVICE,
+            useClass: NodemailerEmailAdapter,
+        },
 
         // Auth Use Cases
         LoginUseCase,
         RegisterUseCase,
+        RequestOtpUseCase,
+        VerifyOtpUseCase,
+        ResetPasswordUseCase,
 
         // Product Use Cases
         GetProductsUseCase,
