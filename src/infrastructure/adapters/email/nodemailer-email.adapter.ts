@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as nodemailer from 'nodemailer';
-import type SMTPTransport from 'nodemailer/lib/smtp-transport';
 import { EmailService } from '../../../application/ports/services/email.service';
 import { OtpCode } from '../../../domain/value-objects/otp-code.vo';
 
@@ -12,13 +11,12 @@ export class NodemailerEmailAdapter implements EmailService {
     constructor(private readonly configService: ConfigService) {
         this.transporter = nodemailer.createTransport({
             service: 'gmail',
-            family: 4,
             auth: {
                 user: this.configService.get('email.user'),
                 pass: this.configService.get('email.pass'),
             },
             connectionTimeout: 10000,
-        } as SMTPTransport.Options);
+        });
     }
 
     async sendOtpEmail(to: string, otp: string): Promise<void> {
