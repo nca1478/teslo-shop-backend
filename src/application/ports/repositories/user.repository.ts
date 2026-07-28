@@ -7,4 +7,9 @@ export interface UserRepository {
     update(id: string, user: Partial<User>): Promise<User>;
     delete(id: string): Promise<void>;
     findAll(page: number, limit: number): Promise<{ users: User[]; total: number }>;
+    updateOtp(
+        id: string,
+        otpData: { otpHash: string; otpExpiresAt: Date; otpAttempts: number },
+    ): Promise<User>;
+    clearOtp(id: string): Promise<void>;
 }

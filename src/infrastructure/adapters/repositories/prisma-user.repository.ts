@@ -8,13 +8,16 @@ import { Role } from '@prisma/client';
 export class PrismaUserRepository implements UserRepository {
     constructor(private readonly prisma: PrismaService) {}
 
-    async findById(id: string): Promise<User | null> {
-        const user = await this.prisma.user.findUnique({
-            where: { id },
-        });
-
-        if (!user) return null;
-
+    private mapToDomain(user: {
+        id: string;
+        email: string;
+        password: string;
+        name: string;
+        role: string;
+        otpHash: string | null;
+        otpExpiresAt: Date | null;
+        otpAttempts: number;
+    }): User {
         return {
             id: user.id,
             email: user.email,
@@ -24,7 +27,20 @@ export class PrismaUserRepository implements UserRepository {
             roles: [user.role],
             createdAt: new Date(),
             updatedAt: new Date(),
+            otpHash: user.otpHash,
+            otpExpiresAt: user.otpExpiresAt,
+            otpAttempts: user.otpAttempts,
         };
+    }
+
+    async findById(id: string): Promise<User | null> {
+        const user = await this.prisma.user.findUnique({
+            where: { id },
+        });
+
+        if (!user) return null;
+
+        return this.mapToDomain(user);
     }
 
     async findByEmail(email: string): Promise<User | null> {
@@ -34,16 +50,7 @@ export class PrismaUserRepository implements UserRepository {
 
         if (!user) return null;
 
-        return {
-            id: user.id,
-            email: user.email,
-            password: user.password,
-            name: user.name,
-            isActive: true,
-            roles: [user.role],
-            createdAt: new Date(),
-            updatedAt: new Date(),
-        };
+        return this.mapToDomain(user);
     }
 
     async create(userData: Omit<User, 'id' | 'createdAt' | 'updatedAt'>): Promise<User> {
@@ -56,16 +63,7 @@ export class PrismaUserRepository implements UserRepository {
             },
         });
 
-        return {
-            id: user.id,
-            email: user.email,
-            password: user.password,
-            name: user.name,
-            isActive: userData.isActive,
-            roles: [user.role],
-            createdAt: new Date(),
-            updatedAt: new Date(),
-        };
+        return this.mapToDomain(user);
     }
 
     async update(id: string, userData: Partial<User>): Promise<User> {
@@ -96,6 +94,9 @@ export class PrismaUserRepository implements UserRepository {
             roles: [user.role],
             createdAt: new Date(),
             updatedAt: new Date(),
+            otpHash: user.otpHash,
+            otpExpiresAt: user.otpExpiresAt,
+            otpAttempts: user.otpAttempts,
         };
     }
 
@@ -118,17 +119,35 @@ export class PrismaUserRepository implements UserRepository {
         ]);
 
         return {
-            users: users.map((user) => ({
-                id: user.id,
-                email: user.email,
-                password: user.password,
-                name: user.name,
-                isActive: true,
-                roles: [user.role],
-                createdAt: new Date(),
-                updatedAt: new Date(),
-            })),
+            users: users.map((user) => this.mapToDomain(user)),
             total,
         };
+    }
+
+    async updateOtp(
+        id: string,
+        otpData: { otpHash: string; otpExpiresAt: Date; otpAttempts: number },
+    ): Promise<User> {
+        const user = await this.prisma.user.update({
+            where: { id },
+            data: {
+                otpHash: otpData.otpHash,
+                otpExpiresAt: otpData.otpExpiresAt,
+                otpAttempts: otpData.otpAttempts,
+            },
+        });
+
+        return this.mapToDomain(user);
+    }
+
+    async clearOtp(id: string): Promise<void> {
+        await this.prisma.user.update({
+            where: { id },
+            data: {
+                otpHash: null,
+                otpExpiresAt: null,
+                otpAttempts: 0,
+            },
+        });
     }
 }
