@@ -11,14 +11,13 @@ export class NodemailerEmailAdapter implements EmailService {
 
     constructor(private readonly configService: ConfigService) {
         this.transporter = nodemailer.createTransport({
-            host: this.configService.get('email.host'),
-            port: this.configService.get('email.port'),
-            secure: this.configService.get('email.secure'),
+            service: 'gmail',
             family: 4,
             auth: {
                 user: this.configService.get('email.user'),
                 pass: this.configService.get('email.pass'),
             },
+            connectionTimeout: 10000,
         } as SMTPTransport.Options);
     }
 
