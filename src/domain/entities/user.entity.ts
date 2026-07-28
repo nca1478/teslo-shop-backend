@@ -7,4 +7,7 @@ export interface User {
     roles: string[];
     createdAt: Date;
     updatedAt: Date;
+    otpHash?: string | null;
+    otpExpiresAt?: Date | null;
+    otpAttempts?: number;
 }
