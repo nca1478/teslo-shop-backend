@@ -3,9 +3,6 @@ import { ValidationPipe, Logger } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { LoggingInterceptor } from './infrastructure/common/interceptors/logging.interceptor';
-import * as dns from 'dns';
-
-dns.setDefaultResultOrder('ipv4first');
 
 async function bootstrap() {
     const logger = new Logger('Bootstrap');
