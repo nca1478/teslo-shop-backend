@@ -1,29 +1,24 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import * as nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 import { EmailService } from '../../../application/ports/services/email.service';
 import { OtpCode } from '../../../domain/value-objects/otp-code.vo';
 
 @Injectable()
-export class NodemailerEmailAdapter implements EmailService {
-    private transporter: nodemailer.Transporter;
+export class ResendEmailAdapter implements EmailService {
+    private resend: Resend;
 
     constructor(private readonly configService: ConfigService) {
-        this.transporter = nodemailer.createTransport({
-            host: this.configService.get('email.host'),
-            port: this.configService.get('email.port'),
-            secure: this.configService.get('email.secure'),
-            auth: {
-                user: this.configService.get('email.user'),
-                pass: this.configService.get('email.pass'),
-            },
-            connectionTimeout: 10000,
-        });
+        this.resend = new Resend(this.configService.get('email.apiKey'));
+    }
+
+    private getFrom(): string {
+        return this.configService.get<string>('email.from') || 'mailjet1478@gmail.com';
     }
 
     async sendOtpEmail(to: string, otp: string): Promise<void> {
-        await this.transporter.sendMail({
-            from: this.configService.get('email.from'),
+        await this.resend.emails.send({
+            from: this.getFrom(),
             to,
             subject: 'Código de recuperación de contraseña',
             text: `Tu código de verificación es: ${otp}\nVálido por ${OtpCode.EXPIRY_MINUTES} minutos.`,
@@ -32,8 +27,8 @@ export class NodemailerEmailAdapter implements EmailService {
     }
 
     async sendPasswordChangedEmail(to: string): Promise<void> {
-        await this.transporter.sendMail({
-            from: this.configService.get('email.from'),
+        await this.resend.emails.send({
+            from: this.getFrom(),
             to,
             subject: 'Contraseña actualizada',
             text: 'Tu contraseña ha sido cambiada exitosamente. Si no realizaste este cambio, contacta a soporte inmediatamente.',
