@@ -17,7 +17,7 @@ import { JwtStrategy } from './infrastructure/adapters/auth/jwt.strategy';
 import { HttpExceptionFilter } from './infrastructure/common/filters/http-exception.filter';
 import { PayPalAdapter } from './infrastructure/adapters/external/paypal.adapter';
 import { CloudinaryAdapter } from './infrastructure/adapters/external/cloudinary.adapter';
-import { MailerSendEmailAdapter } from './infrastructure/adapters/email/mailersend-email.adapter';
+import { ResendEmailAdapter } from './infrastructure/adapters/email/resend-email.adapter';
 
 // Application - Auth
 import { LoginUseCase } from './application/use-cases/auth/login.use-case';
@@ -155,7 +155,7 @@ import emailConfig from './infrastructure/config/email.config';
         },
         {
             provide: INJECTION_TOKENS.EMAIL_SERVICE,
-            useClass: MailerSendEmailAdapter,
+            useClass: ResendEmailAdapter,
         },
 
         // Auth Use Cases

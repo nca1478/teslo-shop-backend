@@ -7,7 +7,6 @@ export default registerAs('email', () => ({
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS,
     from: process.env.SMTP_FROM || 'noreply@teslohop.com',
-    mailersendApiKey: process.env.MAILERSEND_API_KEY,
-    mailersendFromEmail: process.env.MAILERSEND_FROM_EMAIL,
-    mailersendFromName: process.env.MAILERSEND_FROM_NAME || 'Teslo Shop',
+    resendApiKey: process.env.RESEND_API_KEY,
+    resendFromEmail: process.env.RESEND_FROM_EMAIL || 'Teslo Shop <noreply@teslohop.com>',
 }));
