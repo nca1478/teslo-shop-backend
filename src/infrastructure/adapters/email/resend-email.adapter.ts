@@ -21,9 +21,7 @@ export class ResendEmailAdapter implements EmailService {
         const fromEmail = this.configService.get<string>('email.resendFromEmail');
 
         if (!apiKey) {
-            throw new Error(
-                'Resend configuration incomplete: RESEND_API_KEY is required',
-            );
+            throw new Error('Resend configuration incomplete: RESEND_API_KEY is required');
         }
 
         this.resend = new Resend(apiKey);
@@ -54,10 +52,7 @@ export class ResendEmailAdapter implements EmailService {
             to: [to],
             subject: 'Contraseña actualizada — Teslo Shop',
             text: buildPasswordChangedPlainText(),
-            html: buildMainLayout(
-                'Contraseña actualizada',
-                buildPasswordChangedBody(),
-            ),
+            html: buildMainLayout('Contraseña actualizada', buildPasswordChangedBody()),
         });
 
         if (error) {
