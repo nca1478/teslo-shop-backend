@@ -16,7 +16,7 @@ export class RequestOtpUseCase {
 
     async execute(dto: RequestOtpDto): Promise<{ ok: boolean; message?: string }> {
         const user = await this.userRepository.findByEmail(dto.email);
-        if (!user) return { ok: false, message: 'No existe una cuenta con este correo electrónico' };
+        if (!user) return { ok: false, message: 'Error al enviar el código OTP' };
 
         const otpCode = OtpCode.generate();
         const otpHash = await OtpCode.hash(otpCode);
